@@ -23,7 +23,7 @@ const samples=[
 ["mega_showdown:lucarionite","路卡利歐進化石","Lucarionite","Allows Lucario to Mega Evolve into Mega Lucario"],
 ["mega_showdown:red_orb","朱紅色寶珠","Red Orb","Allows Groudon to undergo Primal Reversion"],
 ["mega_showdown:blue_orb","靛藍色寶珠","Blue Orb","Allows Kyogre to undergo Primal Reversion"],
-["mega_showdown:dna_splicers","基因之楔","DNA Splicers","Used to fuse or separate Kyurem"],
+["mega_showdown:dna_splicer","基因之楔","DNA Splicers","Used to fuse or separate Kyurem"],
 ["mega_showdown:mega_stone","超級石","Mega Stone","Raw Mega Stone"]
 ].map(([item_id,name_zh_tw,name_en,tooltip_en])=>({item_id,name_zh_tw,name_en,tooltip_en,tooltip_zh_tw:"",group:"item"}));
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -38,7 +38,7 @@ function draw(){
  document.getElementById("items").innerHTML=found.slice(0,360).map(x=>'<article class="item"><h3>'+esc(x.name_zh_tw||x.name_en)+'</h3><div class="en">'+esc(x.name_en)+'</div><p class="desc">'+esc(clean(x.tooltip_zh_tw)||clean(x.tooltip_en)||"原始資料未提供說明")+'</p><div class="actions"><code>'+esc(x.item_id)+'</code><button type="button" data-id="'+esc(x.item_id)+'">複製</button></div></article>').join("")||"<p>找不到符合條件的道具。</p>";
 }
 document.getElementById("search").addEventListener("input",draw);document.getElementById("filter").addEventListener("change",draw);
-document.getElementById("source").addEventListener("change",async e=>{let file=e.target.files?.[0];if(!file)return;try{let data=JSON.parse(await file.text());if(!Array.isArray(data.item_entries)||!data.item_entries.length||!data.item_entries.every(x=>typeof x.item_id==="string"))throw Error("不是 Mega Showdown 百科 JSON");entries=data.item_entries;loaded=true;try{localStorage.setItem("mega-showdown-132-data",JSON.stringify(entries))}catch{}draw();}catch(err){alert("匯入失敗："+err.message)}});
+document.getElementById("source").addEventListener("change",async e=>{let file=e.target.files?.[0];if(!file)return;try{let data=JSON.parse(await file.text());if(!Array.isArray(data.item_entries)||!data.item_entries.length||!data.item_entries.every(x=>x&&typeof x.name_en==="string"))throw Error("不是 Mega Showdown 百科 JSON");entries=data.item_entries.map(x=>({...x,item_id:x.item_id||((x.id||"").startsWith("block.mega_showdown.")?"mega_showdown:"+x.id.slice("block.mega_showdown.".length):"")}));loaded=true;try{localStorage.setItem("mega-showdown-132-data",JSON.stringify(entries))}catch{}draw();}catch(err){alert("匯入失敗："+err.message)}});
 document.getElementById("reset").onclick=()=>{entries=samples.slice();loaded=false;localStorage.removeItem("mega-showdown-132-data");draw()};
 document.getElementById("items").addEventListener("click",async e=>{let b=e.target.closest("[data-id]");if(!b)return;try{await navigator.clipboard.writeText("/give @s "+b.dataset.id+" 1");b.textContent="已複製";setTimeout(()=>b.textContent="複製",1000)}catch{alert("請手動複製："+b.dataset.id)}});
 draw();
