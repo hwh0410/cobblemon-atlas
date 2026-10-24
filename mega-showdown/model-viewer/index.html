@@ -46,13 +46,13 @@ function numericExpression(v,t){
  if(typeof v!=="string")return 0;
  // Evaluate only the limited numeric/Molang subset used by these source animations.
  // No eval / Function: unknown expressions fall back safely to zero.
- let expr=v.replace(/q\.anim_time/g,String(t)).replace(/math\.pi/gi,String(Math.PI));
+ let expr=v.replace(/q\.anim_time/g,String(t)).replace(/math\.(sin|cos|abs)/g,"$1").replace(/math\.pi/gi,String(Math.PI));
  if(!/^[\d.\s+\-*/(),a-zA-Z_]+$/.test(expr))return 0;
  let ix=0;const tokens=expr.match(/sin|cos|abs|[()+*/,\-]|(?:\d+(?:\.\d*)?|\.\d+)/g);
  if(!tokens||tokens.join("")!==expr.replace(/\s/g,""))return 0;
  function primary(){let a=tokens[ix++];if(a==="-")return -primary();if(a==="+")return primary();
   if(a==="("){const q=expression();if(tokens[ix++]!==")")throw Error("paren");return q}
-  if(["sin","cos","abs"].includes(a)){if(tokens[ix++]!=="(")throw Error("fn");let v=expression();if(tokens[ix++]!==")")throw Error("fn-close");return a==="sin"?Math.sin(v):a==="cos"?Math.cos(v):Math.abs(v)}
+  if(["sin","cos","abs"].includes(a)){if(tokens[ix++]!=="(")throw Error("fn");let v=expression();if(tokens[ix++]!==")")throw Error("fn-close");return a==="sin"?Math.sin(v*Math.PI/180):a==="cos"?Math.cos(v*Math.PI/180):Math.abs(v)}
   const n=Number(a);if(!Number.isFinite(n))throw Error("number");return n}
  function product(){let val=primary();while(tokens[ix]==="*"||tokens[ix]==="/"){let op=tokens[ix++],other=primary();val=op==="*"?val*other:val/other}return val}
  function expression(){let val=product();while(tokens[ix]==="+"||tokens[ix]==="-"){let op=tokens[ix++],other=product();val=op==="+"?val+other:val-other}return val}
@@ -63,7 +63,7 @@ function vecChannel(channel,time){
  if(!channel||typeof channel!=="object")return [0,0,0];
  const keys=Object.keys(channel).map(Number).filter(Number.isFinite).sort((a,b)=>a-b);
  if(!keys.length)return [0,0,0];
- const sample=(k)=>{let row=channel[String(k)]??channel[k];let value=row?.post??row?.pre??row;return Array.isArray(value)?value.map(v=>numericExpression(v,time)):[0,0,0]};
+ const sample=(k)=>{let actualKey=Object.keys(channel).find(key=>Number(key)===k);let row=channel[actualKey];let value=row?.post??row?.pre??row;return Array.isArray(value)?value.map(v=>numericExpression(v,time)):[0,0,0]};
  if(time<=keys[0])return sample(keys[0]);if(time>=keys[keys.length-1])return sample(keys[keys.length-1]);
  let hi=keys.findIndex(k=>k>time),a=keys[hi-1],b=keys[hi];const v0=sample(a),v1=sample(b),p=(time-a)/(b-a);
  // Linear interpolation is intentionally conservative where Bedrock requests Catmull-Rom.
