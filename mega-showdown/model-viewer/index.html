@@ -1,20 +1,20 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f1ea"><title>Minecraft 模型檢視 · Cobblemon Atlas</title><style>
 :root{font-family:"Arial Rounded MT Bold","Noto Sans TC","PingFang TC",sans-serif;background:#f4f1ea;color:#252b2a}*{box-sizing:border-box}body{margin:0}.wrap{max-width:1100px;margin:auto;padding:0 20px}header{border-bottom:1px solid #c9cec3;padding:18px 0}.head{display:flex;justify-content:space-between;align-items:center}a{color:#a43c27}h1{font-size:clamp(28px,4vw,48px);margin:25px 0 8px}p{color:#596760;line-height:1.7}.note{padding:12px 16px;border-left:3px solid #a43c27;background:#ecebe2;font-size:13px;margin:12px 0 18px}.buttons{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}button{font:inherit;border:1px solid #c9cec3;background:#faf8f3;border-radius:5px;padding:12px;cursor:pointer}button.active{color:#a43c27;border-color:#a43c27;background:#f1e1d8}.view{position:relative;border:1px solid #c9cec3;background:linear-gradient(#ecefe7,#dadfd7);border-radius:8px;height:min(65vw,550px);min-height:340px;overflow:hidden}canvas{display:block;width:100%;height:100%;touch-action:none}.loading{position:absolute;top:14px;left:14px;color:#3c5549;font-size:12px;background:#faf8f3cc;padding:7px 11px}.help{font-size:12px}footer{border-top:1px solid #c9cec3;margin-top:30px;padding:20px 0 40px;color:#596760;font-size:12px}footer a{color:#a43c27}
-</style></head><body><header><div class="wrap head"><b>◉ COBBLEMON ATLAS</b><a href="../forms/">← 返回特殊型態圖鑑</a></div></header><main class="wrap"><h1>Minecraft 實際模型預覽</h1><p>這裡使用 Mega Showdown 1.3.2 的原始 Bedrock Geometry（.geo.json）與 PNG 皮膚，直接在瀏覽器中重建可旋轉模型。</p><div class="note">測試版：顯示模組原始模型的靜態預設姿態，已修正 UV 貼圖的上下方向與骨架角度符號；仍未套用遊戲內動畫、特殊發光材質、粒子效果或所有姿勢設定。與遊戲畫面仍可能有差異。</div><div class="buttons" id="buttons"></div><div class="view"><div class="loading" id="state">正在初始化 3D 檢視器…</div><canvas id="scene" aria-label="可旋轉的 Minecraft 寶可夢 3D 模型"></canvas></div><p class="help">滑鼠拖曳或觸控滑動可以旋轉，滾輪可縮放。載入模型與材質需要網路連線。</p></main><footer><div class="wrap">模型與材質源自 <a href="https://github.com/yajatkaul/CobblemonMegaShowdown" target="_blank" rel="noopener">Mega Showdown 官方儲存庫</a>。原創素材及第三方素材授權請見 <a href="https://github.com/yajatkaul/CobblemonMegaShowdown/blob/main/LICENSE.md" target="_blank" rel="noopener">模組授權條款</a>。本站不重新發布材質檔，僅供非商業玩家預覽。</div></footer>
+</style></head><body><header><div class="wrap head"><b>◉ COBBLEMON ATLAS</b><a href="../forms/">← 返回特殊型態圖鑑</a></div></header><main class="wrap"><h1>Minecraft 實際模型預覽</h1><p>這裡使用 Mega Showdown 1.3.2 的原始 Bedrock Geometry（.geo.json）與 PNG 皮膚，直接在瀏覽器中重建可旋轉模型。</p><div class="note">測試版：顯示模組原始模型的靜態預設姿態，新增模組原始站立／戰鬥動畫預覽（部分動畫使用近似插值）。尚未完整支援遊戲的 Molang 表達式、特殊發光材質、粒子或所有動態姿勢。。與遊戲畫面仍可能有差異。</div><div class="buttons" id="buttons"></div><div class="buttons" id="poseControls"><button id="standingBtn" class="active" type="button">站立</button><button id="battleBtn" type="button">戰鬥</button><button id="pauseBtn" type="button">暫停動畫</button><button id="restartBtn" type="button">重播</button></div><div class="view"><div class="loading" id="state">正在初始化 3D 檢視器…</div><canvas id="scene" aria-label="可旋轉的 Minecraft 寶可夢 3D 模型"></canvas></div><p class="help">滑鼠拖曳或觸控滑動可以旋轉，滾輪可縮放。載入模型與材質需要網路連線。</p></main><footer><div class="wrap">模型與材質源自 <a href="https://github.com/yajatkaul/CobblemonMegaShowdown" target="_blank" rel="noopener">Mega Showdown 官方儲存庫</a>。原創素材及第三方素材授權請見 <a href="https://github.com/yajatkaul/CobblemonMegaShowdown/blob/main/LICENSE.md" target="_blank" rel="noopener">模組授權條款</a>。本站不重新發布材質檔，僅供非商業玩家預覽。</div></footer>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
 const models=[
-{name:"路卡利歐",geo:"0448_lucario/lucario.geo.json",tex:"0448_lucario/lucario.png"},
-{name:"超級路卡利歐",geo:"0448_lucario/lucario_mega.geo.json",tex:"0448_lucario/lucario_mega.png"},
-{name:"固拉多",geo:"0383_groudon/groudon.geo.json",tex:"0383_groudon/groudon.png"},
-{name:"原始固拉多",geo:"0383_groudon/groudonprimal.geo.json",tex:"0383_groudon/groudonprimal.png"}
+{name:"路卡利歐",geo:"0448_lucario/lucario.geo.json",tex:"0448_lucario/lucario.png",anim:null,poser:"0448_lucario/lucario.json"},
+{name:"超級路卡利歐",geo:"0448_lucario/lucario_mega.geo.json",tex:"0448_lucario/lucario_mega.png",anim:"0448_lucario/lucario_mega.animation.json",poser:"0448_lucario/lucario_mega.json"},
+{name:"固拉多",geo:"0383_groudon/groudon.geo.json",tex:"0383_groudon/groudon.png",anim:"0383_groudon/groudon.animation.json",poser:"0383_groudon/groudon.json"},
+{name:"原始固拉多",geo:"0383_groudon/groudonprimal.geo.json",tex:"0383_groudon/groudonprimal.png",anim:"0383_groudon/groudonprimal.animation.json",poser:"0383_groudon/groudonprimal.json"}
 ];
 const BASE='https://raw.githubusercontent.com/yajatkaul/CobblemonMegaShowdown/main/common/src/main/resources/assets/cobblemon/';
 const state=document.getElementById('state');const canvas=document.getElementById('scene');
 const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
 const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(42,1,.1,3000);let model=new THREE.Group();scene.add(model);
 const root=new THREE.Group();scene.remove(model);model=root;scene.add(root);
-let distance=90,azimuth=.55,elevation=.2,target=new THREE.Vector3(0,20,0);let current=0,loadId=0;
+let distance=90,azimuth=.55,elevation=.2,target=new THREE.Vector3(0,20,0);let current=0,loadId=0;let activeBones=new Map(),animationData=null,poserData=null,animTime=0,previousFrame=performance.now(),playing=true,poseMode="standing",animKey=null;
 const faceKeys=['east','west','up','down','north','south'];
 function boxUV(geo, cube, texW, texH){
 const uv=cube.uv??[0,0], sz=cube.size||[1,1,1], w=Math.max(0,sz[0]),h=Math.max(0,sz[1]),d=Math.max(0,sz[2]);
@@ -30,7 +30,7 @@ function build(data,texture){
 const g=data['minecraft:geometry']?.[0];if(!g)throw Error('模型缺少 minecraft:geometry');const tw=g.description.texture_width,th=g.description.texture_height;
 const boneMap=new Map(),bones=g.bones||[];
 const material=new THREE.MeshBasicMaterial({map:texture,transparent:true,alphaTest:.05,side:THREE.DoubleSide});
-for(const b of bones){const gr=new THREE.Group();gr.name=b.name;boneMap.set(b.name,gr)}
+for(const b of bones){const gr=new THREE.Group();gr.name=b.name;boneMap.set(b.name,gr);gr.userData.baseRotation=b.rotation||[0,0,0];gr.userData.basePivot=b.pivot||[0,0,0];gr.userData.parentPivot=bones.find(x=>x.name===b.parent)?.pivot||[0,0,0]}activeBones=boneMap;
 for(const b of bones){const gr=boneMap.get(b.name),parent=boneMap.get(b.parent);(parent||root).add(gr);
 const pivot=b.pivot||[0,0,0], parentPivot=bones.find(x=>x.name===b.parent)?.pivot||[0,0,0];gr.position.set(pivot[0]-parentPivot[0],pivot[1]-parentPivot[1],pivot[2]-parentPivot[2]);rotation(gr,b.rotation);
 for(const cube of b.cubes||[]){const size=cube.size||[0,0,0];if(size.every(v=>v===0))continue;
@@ -40,13 +40,66 @@ const cp=cube.pivot||pivot;const intermediate=new THREE.Group();intermediate.pos
 }
 }
 }
+
+function numericExpression(v,t){
+ if(typeof v==="number")return v;
+ if(typeof v!=="string")return 0;
+ // Evaluate only the limited numeric/Molang subset used by these source animations.
+ // No eval / Function: unknown expressions fall back safely to zero.
+ let expr=v.replace(/q\.anim_time/g,String(t)).replace(/math\.pi/gi,String(Math.PI));
+ if(!/^[\d.\s+\-*/(),a-zA-Z_]+$/.test(expr))return 0;
+ let ix=0;const tokens=expr.match(/sin|cos|abs|[()+*/,\-]|(?:\d+(?:\.\d*)?|\.\d+)/g);
+ if(!tokens||tokens.join("")!==expr.replace(/\s/g,""))return 0;
+ function primary(){let a=tokens[ix++];if(a==="-")return -primary();if(a==="+")return primary();
+  if(a==="("){const q=expression();if(tokens[ix++]!==")")throw Error("paren");return q}
+  if(["sin","cos","abs"].includes(a)){if(tokens[ix++]!=="(")throw Error("fn");let v=expression();if(tokens[ix++]!==")")throw Error("fn-close");return a==="sin"?Math.sin(v):a==="cos"?Math.cos(v):Math.abs(v)}
+  const n=Number(a);if(!Number.isFinite(n))throw Error("number");return n}
+ function product(){let val=primary();while(tokens[ix]==="*"||tokens[ix]==="/"){let op=tokens[ix++],other=primary();val=op==="*"?val*other:val/other}return val}
+ function expression(){let val=product();while(tokens[ix]==="+"||tokens[ix]==="-"){let op=tokens[ix++],other=product();val=op==="+"?val+other:val-other}return val}
+ try{const result=expression();return ix===tokens.length&&Number.isFinite(result)?result:0}catch{return 0}
+}
+function vecChannel(channel,time){
+ if(Array.isArray(channel))return channel.map(v=>numericExpression(v,time));
+ if(!channel||typeof channel!=="object")return [0,0,0];
+ const keys=Object.keys(channel).map(Number).filter(Number.isFinite).sort((a,b)=>a-b);
+ if(!keys.length)return [0,0,0];
+ const sample=(k)=>{let row=channel[String(k)]??channel[k];let value=row?.post??row?.pre??row;return Array.isArray(value)?value.map(v=>numericExpression(v,time)):[0,0,0]};
+ if(time<=keys[0])return sample(keys[0]);if(time>=keys[keys.length-1])return sample(keys[keys.length-1]);
+ let hi=keys.findIndex(k=>k>time),a=keys[hi-1],b=keys[hi];const v0=sample(a),v1=sample(b),p=(time-a)/(b-a);
+ // Linear interpolation is intentionally conservative where Bedrock requests Catmull-Rom.
+ return [0,1,2].map(i=>(v0[i]||0)*(1-p)+(v1[i]||0)*p)
+}
+function selectAnimation(){
+ const poses=poserData?.poses||{},pose=poses[poseMode]||poses.standing||poses["battle-standing"];
+ const a=pose?.animations?.find(x=>typeof x==="string"&&x.includes("q.bedrock("));
+ const m=a?.match(/q\.bedrock\('([^']+)',\s*'([^']+)'\)/);
+ const key=m?"animation."+m[1]+"."+m[2]:null;
+ animKey=(key&&animationData?.animations?.[key])?key:null;
+ document.getElementById('standingBtn').classList.toggle('active',poseMode==='standing');
+ document.getElementById('battleBtn').classList.toggle('active',poseMode==='battle-standing');
+ if(!animKey)state.textContent=models[current].name+' · 無可用的 '+(poseMode==="standing"?"站立":"戰鬥")+' 動畫，顯示原始姿勢';
+}
+function applyAnimation(time){
+ const animation=animKey&&animationData?.animations?.[animKey];if(!activeBones.size)return;
+ const length=animation?.animation_length||0;
+ const frameTime=length>0?time%length:time;
+ for(const bone of activeBones.values()){
+  const raw=bone.userData.baseRotation||[0,0,0],origin=bone.userData.basePivot||[0,0,0],parent=bone.userData.parentPivot||[0,0,0];
+  const channels=animation?.bones?.[bone.name]||{};
+  const r=vecChannel(channels.rotation,frameTime),pos=vecChannel(channels.position,frameTime),scale=channels.scale?vecChannel(channels.scale,frameTime):[1,1,1];
+  rotation(bone,[raw[0]+(r[0]||0),raw[1]+(r[1]||0),raw[2]+(r[2]||0)]);
+  bone.position.set(origin[0]-parent[0]+(pos[0]||0),origin[1]-parent[1]+(pos[1]||0),origin[2]-parent[2]+(pos[2]||0));
+  bone.scale.set(...scale.map(v=>Number.isFinite(v)?v:1))
+ }
+}
+
 async function select(index){const requested=++loadId;current=index;document.querySelectorAll('#buttons button').forEach((b,i)=>b.classList.toggle('active',i===index));state.textContent='載入 '+models[index].name+' …';const def=models[index];try{
-const [geoResponse,texture]=await Promise.all([fetch(BASE+'bedrock/pokemon/models/'+def.geo),new THREE.TextureLoader().loadAsync(BASE+'textures/pokemon/'+def.tex)]);
+const [geoResponse,texture,animResponse,poserResponse]=await Promise.all([fetch(BASE+'bedrock/pokemon/models/'+def.geo),new THREE.TextureLoader().loadAsync(BASE+'textures/pokemon/'+def.tex),def.anim?fetch(BASE+'bedrock/pokemon/animations/'+def.anim):Promise.resolve(null),def.poser?fetch(BASE+'bedrock/pokemon/posers/'+def.poser):Promise.resolve(null)]);
 if(requested!==loadId)return;if(!geoResponse.ok)throw Error('模型檔 HTTP '+geoResponse.status);
 texture.colorSpace=THREE.SRGBColorSpace;texture.magFilter=THREE.NearestFilter;texture.minFilter=THREE.NearestFilter;texture.flipY=true;
-root.traverse(obj=>{if(obj.isMesh)obj.geometry?.dispose()});root.clear();build(await geoResponse.json(),texture);root.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(root);const span=bounds.getSize(new THREE.Vector3());target=bounds.getCenter(new THREE.Vector3());distance=Math.max(span.length()*1.7,20);state.textContent=def.name+' · 原始模型預覽';
+root.traverse(obj=>{if(obj.isMesh)obj.geometry?.dispose()});root.clear();build(await geoResponse.json(),texture);animationData=animResponse?.ok?await animResponse.json():null;poserData=poserResponse?.ok?await poserResponse.json():null;animTime=0;selectAnimation();applyAnimation(0);root.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(root);const span=bounds.getSize(new THREE.Vector3());target=bounds.getCenter(new THREE.Vector3());distance=Math.max(span.length()*1.7,20);if(animKey)state.textContent=def.name+' · 播放原始站立動畫';
 }catch(e){state.textContent='模型讀取失敗：'+e.message;console.error(e)}}
-document.getElementById('buttons').innerHTML=models.map((m,i)=>'<button type="button">'+m.name+'</button>').join('');document.querySelectorAll('#buttons button').forEach((b,i)=>b.addEventListener('click',()=>select(i)));
+document.getElementById('standingBtn').onclick=()=>{poseMode='standing';animTime=0;selectAnimation();applyAnimation(0)};document.getElementById('battleBtn').onclick=()=>{poseMode='battle-standing';animTime=0;selectAnimation();applyAnimation(0)};document.getElementById('pauseBtn').onclick=()=>{playing=!playing;document.getElementById('pauseBtn').textContent=playing?'暫停動畫':'繼續播放'};document.getElementById('restartBtn').onclick=()=>{animTime=0;playing=true;document.getElementById('pauseBtn').textContent='暫停動畫'};document.getElementById('buttons').innerHTML=models.map((m,i)=>'<button type="button">'+m.name+'</button>').join('');document.querySelectorAll('#buttons button').forEach((b,i)=>b.addEventListener('click',()=>select(i)));
 function resize(){const rect=canvas.parentElement.getBoundingClientRect();renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;camera.updateProjectionMatrix()}
-new ResizeObserver(resize).observe(canvas.parentElement);resize();let down=false,lastX=0,lastY=0;canvas.addEventListener('pointerdown',e=>{down=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointerup',()=>{down=false});canvas.addEventListener('pointermove',e=>{if(!down)return;azimuth+=(e.clientX-lastX)*.009;elevation=Math.max(-1.1,Math.min(1.1,elevation+(e.clientY-lastY)*.007));lastX=e.clientX;lastY=e.clientY});canvas.addEventListener('wheel',e=>{e.preventDefault();distance=Math.max(5,Math.min(1000,distance*Math.exp(e.deltaY*.001)))},{passive:false});function tick(){camera.position.set(target.x+Math.sin(azimuth)*Math.cos(elevation)*distance,target.y+Math.sin(elevation)*distance,target.z-Math.cos(azimuth)*Math.cos(elevation)*distance);camera.lookAt(target);renderer.render(scene,camera);requestAnimationFrame(tick)}tick();select(0);
+new ResizeObserver(resize).observe(canvas.parentElement);resize();let down=false,lastX=0,lastY=0;canvas.addEventListener('pointerdown',e=>{down=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointerup',()=>{down=false});canvas.addEventListener('pointermove',e=>{if(!down)return;azimuth+=(e.clientX-lastX)*.009;elevation=Math.max(-1.1,Math.min(1.1,elevation+(e.clientY-lastY)*.007));lastX=e.clientX;lastY=e.clientY});canvas.addEventListener('wheel',e=>{e.preventDefault();distance=Math.max(5,Math.min(1000,distance*Math.exp(e.deltaY*.001)))},{passive:false});function tick(now){const dt=Math.min(.1,Math.max(0,(now-previousFrame)/1000));previousFrame=now;if(playing){animTime+=dt;applyAnimation(animTime)}camera.position.set(target.x+Math.sin(azimuth)*Math.cos(elevation)*distance,target.y+Math.sin(elevation)*distance,target.z-Math.cos(azimuth)*Math.cos(elevation)*distance);camera.lookAt(target);renderer.render(scene,camera);requestAnimationFrame(tick)}tick();select(0);
 </script></body></html>
