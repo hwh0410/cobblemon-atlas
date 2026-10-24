@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#111827"><title>Mega Showdown 1.3.2｜Cobblemon Atlas</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;background:#0b101b;color:#e9eef7}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse 80% 35% at 80% 0,#193e43,transparent 70%),#0b101b;min-height:100vh}main{max-width:1240px;margin:auto;padding:24px}a{color:#8df0d0;text-decoration:none}a:hover{text-decoration:underline}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #293848;padding-bottom:19px}header strong{font-size:18px}.hint,small{color:#9bafc4}.eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;color:#74d9b9;margin-top:44px}h1{font-size:clamp(29px,5vw,48px);margin:10px 0}p{line-height:1.7;color:#afbecd}h2{font-size:22px;margin:34px 0 14px}.notice{border:1px solid #365767;background:#132536;border-radius:12px;padding:15px;margin:22px 0}.layout{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.tile,.item{border:1px solid #2e4052;background:#141f2d;border-radius:13px;padding:17px}.tile h3,.item h3{margin:0 0 8px;font-size:17px}.tile p,.item p{margin:8px 0;font-size:14px}.tag{display:inline-block;border:1px solid #446358;color:#a4f0d4;padding:3px 8px;border-radius:6px;font-size:11px}.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0}.controls input[type=search]{flex:1;min-width:200px}input,button,select{font:inherit;border-radius:9px;padding:11px;background:#142538;color:#edf7ff;border:1px solid #395468}button{cursor:pointer}button:hover{border-color:#74d9b9}input[type=file]{max-width:100%;font-size:12px}.item .en{color:#9bafc4;font-size:13px}.item code{display:block;overflow-wrap:anywhere;font-size:12px;color:#87d7f0;margin-top:12px}.item .actions{display:flex;justify-content:space-between;align-items:center;gap:8px}.item .actions button{padding:6px 10px;font-size:12px}.item .desc{white-space:pre-line}.muted{color:#91a5ba;font-size:12px}.hidden{display:none}footer{border-top:1px solid #2b3a4e;margin:36px 0;padding:24px 0;color:#8ca1b7;font-size:12px}@media(max-width:850px){main{padding:16px}.layout{grid-template-columns:1fr}header{flex-wrap:wrap}h1{margin-top:10px}}
+</style></head><body><main><header><strong>◉ Cobblemon Atlas</strong><a href="../index.html">← 回到原版玩家手冊</a></header>
+<div class="eyebrow">MINECRAFT 1.21.1 · NEOFORGE · COBBLEMON 1.8.2</div><h1>Mega Showdown 百科</h1><p>對應 Mega Showdown 1.3.2。整理特殊形態與道具中英對照；原文說明與操作教學分開呈現，避免將推測當成模組機制。</p>
+<div class="notice">原站圖鑑是 <b>Cobblemon 1.3.2（Forge 1.19.2）</b> 的歷史資料；本專區是新版 <b>Cobblemon 1.8.2</b> 的 Mega Showdown。請勿混用版本指令或模型資料。</div>
+<h2>特殊形態速查</h2><section class="layout" id="mechanics"></section>
+<h2>道具百科</h2><p class="hint">可搜尋中文、英文名稱、道具 ID 與原文說明，點「複製」取得創造模式測試用指令。下方可匯入之前產生的完整 <code>MegaShowdown_1.3.2_網頁百科資料.json</code>，載入 328 筆條目。</p>
+<div class="controls"><input id="search" type="search" placeholder="搜尋：Lucarionite、原始回歸、mega_showdown:…" aria-label="搜尋道具"><select id="filter"><option value="">所有類型</option><option value="item">道具</option><option value="block">方塊</option></select><input id="source" type="file" accept=".json,application/json" aria-label="匯入 Mega Showdown 百科 JSON"><button id="reset" type="button">恢復範例資料</button></div><p class="muted" id="count"></p><section class="layout" id="items"></section><footer>資料來源：Mega Showdown 1.3.2 JAR 英文語言檔及翻譯清單。部分教學為操作摘要，請以遊戲內實測為準。匯入資料僅保存在當前瀏覽器，不會上傳伺服器。</footer></main>
+<script>
+const mechanics=[
+["超級進化 Mega Evolution","將對應超級石交由寶可夢攜帶，玩家裝備有效鑰石配件，在戰鬥介面啟動超級進化。","/givepokemon lucario"],
+["原始回歸 Primal Reversion","固拉多攜帶朱紅色寶珠，蓋歐卡攜帶靛藍色寶珠；進入戰鬥測試原始回歸。","/givepokemon groudon"],
+["神獸融合 Fusion","酋雷姆搭配捷克羅姆／萊希拉姆及基因之楔，測試黑／白酋雷姆融合與分離。請先備份世界。","/givepokemon kyurem"],
+["Z 招式 Z-Moves","搭配 Z 手環、Z 純晶及符合條件的招式，於戰鬥中發動。",""],
+["極巨化 Dynamax","搭配極巨化配件與適用戰鬥條件；部分物種具有超極巨化外觀。",""],
+["太晶化 Terastallization","搭配太晶珠等資源，使用寶可夢太晶屬性相關機制。",""]
+];
+const samples=[
+["mega_showdown:lucarionite","路卡利歐進化石","Lucarionite","Allows Lucario to Mega Evolve into Mega Lucario"],
+["mega_showdown:red_orb","朱紅色寶珠","Red Orb","Allows Groudon to undergo Primal Reversion"],
+["mega_showdown:blue_orb","靛藍色寶珠","Blue Orb","Allows Kyogre to undergo Primal Reversion"],
+["mega_showdown:dna_splicers","基因之楔","DNA Splicers","Used to fuse or separate Kyurem"],
+["mega_showdown:mega_stone","超級石","Mega Stone","Raw Mega Stone"]
+].map(([item_id,name_zh_tw,name_en,tooltip_en])=>({item_id,name_zh_tw,name_en,tooltip_en,tooltip_zh_tw:"",group:"item"}));
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const clean=s=>String(s??"").replace(/§[0-9a-fk-or]/ig,"").trim();
+let entries=samples.slice(),loaded=false;
+try{let v=JSON.parse(localStorage.getItem("mega-showdown-132-data")||"null");if(v?.length&&Array.isArray(v)){entries=v;loaded=true}}catch{}
+document.getElementById("mechanics").innerHTML=mechanics.map(([title,desc,cmd])=>'<article class="tile"><h3>'+esc(title)+'</h3><p>'+esc(desc)+'</p>'+(cmd?'<code>'+esc(cmd)+'</code>':'')+'</article>').join("");
+function draw(){
+ let q=document.getElementById("search").value.toLowerCase().trim(),f=document.getElementById("filter").value;
+ let found=entries.filter(x=>(!f||x.group===f)&&(!q||[x.item_id,x.name_en,x.name_zh_tw,x.tooltip_en,x.tooltip_zh_tw].some(t=>String(t||"").toLowerCase().includes(q))));
+ document.getElementById("count").textContent=(loaded?"已載入完整版資料":"目前顯示示範項目；匯入 JSON 可使用完整資料")+" · "+found.length+" / "+entries.length+" 筆";
+ document.getElementById("items").innerHTML=found.slice(0,360).map(x=>'<article class="item"><h3>'+esc(x.name_zh_tw||x.name_en)+'</h3><div class="en">'+esc(x.name_en)+'</div><p class="desc">'+esc(clean(x.tooltip_zh_tw)||clean(x.tooltip_en)||"原始資料未提供說明")+'</p><div class="actions"><code>'+esc(x.item_id)+'</code><button type="button" data-id="'+esc(x.item_id)+'">複製</button></div></article>').join("")||"<p>找不到符合條件的道具。</p>";
+}
+document.getElementById("search").addEventListener("input",draw);document.getElementById("filter").addEventListener("change",draw);
+document.getElementById("source").addEventListener("change",async e=>{let file=e.target.files?.[0];if(!file)return;try{let data=JSON.parse(await file.text());if(!Array.isArray(data.item_entries)||!data.item_entries.length||!data.item_entries.every(x=>typeof x.item_id==="string"))throw Error("不是 Mega Showdown 百科 JSON");entries=data.item_entries;loaded=true;try{localStorage.setItem("mega-showdown-132-data",JSON.stringify(entries))}catch{}draw();}catch(err){alert("匯入失敗："+err.message)}});
+document.getElementById("reset").onclick=()=>{entries=samples.slice();loaded=false;localStorage.removeItem("mega-showdown-132-data");draw()};
+document.getElementById("items").addEventListener("click",async e=>{let b=e.target.closest("[data-id]");if(!b)return;try{await navigator.clipboard.writeText("/give @s "+b.dataset.id+" 1");b.textContent="已複製";setTimeout(()=>b.textContent="複製",1000)}catch{alert("請手動複製："+b.dataset.id)}});
+draw();
+</script></body></html>
