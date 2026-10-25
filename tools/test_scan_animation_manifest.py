@@ -4,10 +4,15 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scan_animation_manifest import main, references
+from scan_animation_manifest import main, references, value_digest
 
 
 class ManifestTests(unittest.TestCase):
+    def test_clip_hash_ignores_json_key_order(self):
+        self.assertEqual(value_digest({"bones": {"body": {"rotation": [0, 1, 0]}}, "loop": True}),
+                         value_digest({"loop": True, "bones": {"body": {"rotation": [0, 1, 0]}}}))
+        self.assertNotEqual(value_digest({"loop": True}), value_digest({"loop": False}))
+
     def test_bedrock_quotes(self):
         _, calls = references({"x": "q.bedrock('idle','ground') and q.bedrock(\"fly\",\"air\")"})
         self.assertEqual(calls, [("idle", "ground"), ("fly", "air")])
