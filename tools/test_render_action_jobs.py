@@ -4,7 +4,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from render_action_jobs import atomic_json, channel_sampler, inspect_frames
+from render_action_jobs import atomic_json, channel_sampler, inspect_frames, adjust_fixed_camera
 
 
 class FakeRenderer:
@@ -30,6 +30,18 @@ class RenderActionTests(unittest.TestCase):
             target = Path(tmp) / "result.json"
             atomic_json(target, result)
             self.assertTrue(target.is_file())
+
+    def test_union_bbox_and_camera_correction(self):
+        frames = [Image.new("RGBA", (20, 20)) for _ in range(2)]
+        frames[0].putpixel((19, 8), (255, 0, 0, 255))
+        frames[1].putpixel((0, 10), (255, 0, 0, 255))
+        stats = inspect_frames(frames, 1)
+        self.assertEqual(stats["alpha_bbox"], (0, 8, 20, 11))
+        self.assertGreater(stats["edge_alpha_pixels"], 0)
+        info = {"profileScale": 1.0, "profileTranslation": [0, 0, 0]}
+        adjust_fixed_camera(info, (48, 52, 224, 185), 224)
+        self.assertLess(info["profileScale"], 1.0)
+        self.assertLess(info["profileTranslation"][0], 0)
 
 
 if __name__ == "__main__":
