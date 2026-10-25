@@ -170,6 +170,19 @@ def owned(record, names):
                for n in names)
 
 
+def resolver_model_names(data):
+    if not isinstance(data, dict):
+        return set()
+    names = set()
+    for variation in data.get("variations", []):
+        if not isinstance(variation, dict):
+            continue
+        model = variation.get("model")
+        if isinstance(model, str):
+            names.add(model.split(":")[-1].removesuffix(".geo").lower())
+    return names
+
+
 def action_id(clip_key, used):
     base = re.sub(r"[^a-z0-9_-]+", "_", clip_key.lower().split(".")[-1]).strip("_") or "clip"
     value = base
@@ -187,6 +200,30 @@ def scan_form(form, records, clip_catalog):
     geometries = [(r, bones) for r, bones in geometries if bones]
     posers = [r for r in relevant if "poser" in r["relative"].lower()]
     resolvers = [r for r in relevant if "resolver" in r["relative"].lower()]
+    shared_namespace = set()
+    shared_poser_paths = set()
+    # Explicit resolver -> Mega model link can authorize a species-family search.
+    # Never infer shared Poser/animation from a mere similar filename.
+    if form.get("kind") == "special":
+        model_names = {r["path"].name.lower().removesuffix(".geo.json") for r, _ in geometries}
+        for r in records:
+            if "resolver" not in r["relative"].lower() or not (resolver_model_names(r["data"]) & model_names):
+                continue
+            if not re.match(r"^" + re.escape(form["pokemon_id"]) + r"_", r["path"].parent.name):
+                continue
+            if r not in resolvers:
+                resolvers.append(r)
+            family = r["path"].parent.name
+            species = r["data"].get("species", "")
+            if isinstance(species, str) and ":" in species:
+                shared_namespace.add((r["pack"], species.split(":", 1)[1].lower()))
+            for poser in records:
+                if poser["pack"] != r["pack"] or "poser" not in poser["relative"].lower():
+                    continue
+                if family in poser["relative"].lower().split("/"):
+                    if poser not in posers:
+                        posers.append(poser)
+                    shared_poser_paths.add((poser["pack"], poser["relative"]))
     # Animation JSON may live in a generic path. Discover by exact clip namespace,
     # but require the form to be named in the key or referenced by a form poser.
     form_refs = set()
@@ -200,6 +237,10 @@ def scan_form(form, records, clip_catalog):
     for name_part in names:
         clip_candidates.extend((key, clip, r, True, key in linked_keys)
                                for key, clip, r in clip_catalog.get("prefix", {}).get(name_part, []))
+    for pack_name, species in shared_namespace:
+        clip_candidates.extend((key, clip, r, False, False)
+                               for key, clip, r in clip_catalog.get("prefix", {}).get(species, [])
+                               if r["pack"] == pack_name)
     for key in linked_keys:
         clip_candidates.extend((key, clip, r, False, True)
                                for clip, r in clip_catalog.get("key", {}).get(key, []))
@@ -241,7 +282,10 @@ def scan_form(form, records, clip_catalog):
             same_pack_posers = [r for r in posers if r["pack"] == source["pack"]]
             if not same_pack_posers:
                 reasons.append("missing_same_pack_poser")
-            confidence = "candidate" if matching and same_pack_geo and same_pack_posers and not conflict else "audit"
+            shared = any((r["pack"], r["relative"]) in shared_poser_paths for r in same_pack_posers)
+            if shared:
+                reasons.append("shared_poser_requires_link_validation")
+            confidence = "candidate" if matching and same_pack_geo and same_pack_posers and not conflict and not shared else "audit"
             actions.append(dict(id=aid, clip_key=clip_key, label_zh=label,
                                 category=category, status="pending", file=None, bytes=None,
                                 source_pack=source["pack"], animation_path=source["relative"],
