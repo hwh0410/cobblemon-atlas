@@ -169,6 +169,28 @@ def choose_actions(entries, forms, requested):
     return list(chosen.values())
 
 
+def ranked_poser_paths(paths, form):
+    """Prefer the precise non-Mega poser before similarly named form variants.
+
+    The file list is not a priority list: alphabetical ordering can put
+    megarayquaza.json ahead of rayquaza.json for normal Rayquaza.
+    """
+    species = form.split("_", 1)[-1].lower()
+    base = species.removesuffix("_mega")
+    def score(rel):
+        stem = Path(rel).stem.lower()
+        if stem == species:
+            return (0, stem, rel)
+        if stem == base:
+            return (1, stem, rel)
+        if species.endswith("_mega") and "mega" in stem:
+            return (2, stem, rel)
+        if "mega" not in species and "mega" in stem:
+            return (5, stem, rel)
+        return (3, stem, rel)
+    return sorted(paths, key=score)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--repo", type=Path, required=True, help="Local cobblemon-bedrock root")
@@ -281,7 +303,7 @@ def main(argv=None):
             info = old_find(form, form.split("_", 1)[-1])
             info["clips"] = [(action["clip_key"], clip)]
             # Recover any same-pack poser metadata for fixed camera framing.
-            for rel in action.get("poser_paths", []):
+            for rel in ranked_poser_paths(action.get("poser_paths", []), form):
                 poser_file = source_root / rel
                 if poser_file.is_file():
                     poser = renderer.load_json(str(poser_file))
