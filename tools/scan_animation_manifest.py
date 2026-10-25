@@ -34,6 +34,12 @@ def digest(path):
     return h.hexdigest()
 
 
+def value_digest(value):
+    """Compare individual clips, not their enclosing animation JSON files."""
+    canonical = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
 def safe_json(path):
     try:
         return json.loads(path.read_text(encoding="utf-8-sig")), None
@@ -211,7 +217,7 @@ def scan_form(form, records, clip_catalog):
         model_pack_bones[geo["pack"]].update(bones)
     for key in sorted(by_key):
         candidates = sorted(by_key[key], key=lambda c: (c[2]["pack"], c[2]["relative"]))
-        conflict = len({c[2]["sha256"] for c in candidates}) > 1
+        conflict = len({value_digest(c[1]) for c in candidates}) > 1
         for i, (clip_key, clip, source, specific, linked) in enumerate(candidates):
             moving, conditional = dynamic_info(clip)
             matching = moving & model_pack_bones[source["pack"]]
@@ -232,13 +238,15 @@ def scan_form(form, records, clip_catalog):
                 reasons.append("duplicate_clip_key_conflict")
             if conditional:
                 reasons.append("conditional_or_molang_needs_render_check")
-            if not posers:
-                reasons.append("poser_not_resolved")
-            confidence = "candidate" if matching and same_pack_geo and posers and not conflict else "audit"
+            same_pack_posers = [r for r in posers if r["pack"] == source["pack"]]
+            if not same_pack_posers:
+                reasons.append("missing_same_pack_poser")
+            confidence = "candidate" if matching and same_pack_geo and same_pack_posers and not conflict else "audit"
             actions.append(dict(id=aid, clip_key=clip_key, label_zh=label,
                                 category=category, status="pending", file=None, bytes=None,
                                 source_pack=source["pack"], animation_path=source["relative"],
-                                animation_sha256=source["sha256"], poser_paths=[r["relative"] for r in posers],
+                                animation_sha256=source["sha256"], clip_sha256=value_digest(clip),
+                                poser_paths=[r["relative"] for r in posers],
                                 resolver_paths=[r["relative"] for r in resolvers],
                                 geometry_paths=[r["relative"] for r in same_pack_geo],
                                 duration_sec=duration if isinstance(duration, (int, float)) else None,
