@@ -47,19 +47,21 @@ def contact_sheet(frames, title, target):
 
 def audit(root, form_actions, out, manifest, min_short_side=.22, max_refits=4):
     idx={e["form_id"]:e for e in manifest.get("entries",[])}
+    checkpoint=json.loads((root/"checkpoints/render-jobs.json").read_text()).get("jobs",{})
     report={"schema_version":1,"policy":"review_only_no_webp_mutations","jobs":{}}
     for form,action in form_actions:
         key=f"{form}/{action}"
         path=root/"renders"/form/(action+".webp")
         if not path.is_file():
-            report["jobs"][key]={"review":"missing","reason":"webp_not_found"}
+            prev=checkpoint.get(key,{})
+            report["jobs"][key]={"review":"not_rendered","reason":prev.get("reason","webp_not_found"),"prior_status":prev.get("status","missing")}
             continue
         frames,metrics=examine(path)
         choices=[a for a in idx.get(form,{}).get("actions",[])
                  if a.get("clip_key","").rsplit(".",1)[-1]==action]
         choices.sort(key=lambda a:(a.get("model_bones_matched",0),a.get("source_pack")=="merged_pack"),reverse=True)
         selected=choices[0] if choices else {}
-        previous=json.loads((root/"checkpoints/render-jobs.json").read_text()).get("jobs",{}).get(key,{})
+        previous=checkpoint.get(key,{})
         flags=[]
         if "old" in action.lower() or "test" in action.lower():flags.append("legacy_or_test_clip_name")
         if min(min(a,b) for a,b in zip(metrics["bbox_width_fraction"],metrics["bbox_height_fraction"])) < min_short_side:
