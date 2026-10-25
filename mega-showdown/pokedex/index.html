@@ -81,10 +81,18 @@ $("#next").onclick=()=>{page++;redraw();window.scrollTo({top:0,behavior:"smooth"
  const resp=await fetch("../data/pokemon-animated.json",{cache:"no-cache"});if(!resp.ok)throw Error("HTTP "+resp.status);
  const data=await resp.json();if(!Array.isArray(data))throw Error("索引格式不正確");
  entries=data.filter(r=>/^\d{4}_[a-z0-9_-]+$/.test(r.id)&&/^assets\/pokemon-animated\/[a-z0-9_-]+\.webp$/.test(r.image_path));
- for(const row of missingBase){if(!entries.some(x=>x.id===row.id))entries.push({...row,kind:"base",missing:true,bytes:0,image_path:""})}
+ let reviewRows=[];
+ try {
+  const response=await fetch("../data/missing-base-review.json",{cache:"no-cache"});
+  if(response.ok){const audit=await response.json();if(Array.isArray(audit.entries))reviewRows=audit.entries.filter(x=>/^\d{4}_[a-z0-9_-]+$/.test(x.id)&&/^\d{4}$/.test(x.pokemon_id))}
+ }catch(error){console.warn("一般形態盤點清單讀取失敗",error)}
+ for(const row of [...missingBase,...reviewRows]){
+  if(!entries.some(x=>x.pokemon_id===row.pokemon_id&&x.kind==="base"))
+   entries.push({...row,kind:"base",missing:true,bytes:0,image_path:""})
+ }
  for(const r of entries){if(!groups.has(r.pokemon_id))groups.set(r.pokemon_id,[]);groups.get(r.pokemon_id).push(r)}
  for(const rows of groups.values())rows.sort((a,b)=>(a.kind==="base"?-1:1)-(b.kind==="base"?-1:1));
- $("#stat").textContent=data.length+" 個已收錄 WebP · "+missingBase.filter(r=>entries.some(x=>x.id===r.id&&x.missing)).length+" 個待補動畫";
+ $("#stat").textContent=data.length+" 個已收錄 WebP · "+entries.filter(r=>r.missing).length+" 個待補動畫";
  try{const namesResponse=await fetch("../../data/names-zh-hant.json");if(namesResponse.ok){const names=await namesResponse.json();if(Array.isArray(names))zhNames=names}}catch(e){console.warn("中文名稱讀取失敗，保留英文",e)}
  redraw();
  const target=new URLSearchParams(location.search).get("pokemon");

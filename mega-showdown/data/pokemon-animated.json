@@ -1187,7 +1187,7 @@
     "id": "0122_mr_mime",
     "pokemon_id": "0122",
     "form": "mr_mime",
-    "kind": "special",
+    "kind": "base",
     "image_path": "assets/pokemon-animated/0122_mr_mime.webp",
     "bytes": 497170
   },
@@ -2483,7 +2483,7 @@
     "id": "0250_ho_oh",
     "pokemon_id": "0250",
     "form": "ho_oh",
-    "kind": "special",
+    "kind": "base",
     "image_path": "assets/pokemon-animated/0250_ho_oh.webp",
     "bytes": 11230
   },
@@ -4123,7 +4123,7 @@
     "id": "0439_mime_jr",
     "pokemon_id": "0439",
     "form": "mime_jr",
-    "kind": "special",
+    "kind": "base",
     "image_path": "assets/pokemon-animated/0439_mime_jr.webp",
     "bytes": 300490
   },
@@ -4363,7 +4363,7 @@
     "id": "0474_porygon-z",
     "pokemon_id": "0474",
     "form": "porygon-z",
-    "kind": "special",
+    "kind": "base",
     "image_path": "assets/pokemon-animated/0474_porygon-z.webp",
     "bytes": 322654
   },
@@ -7339,7 +7339,7 @@
     "id": "0782_jangmo-o",
     "pokemon_id": "0782",
     "form": "jangmo-o",
-    "kind": "special",
+    "kind": "base",
     "image_path": "assets/pokemon-animated/0782_jangmo-o.webp",
     "bytes": 6570
   },
@@ -7347,7 +7347,7 @@
     "id": "0783_hakamo-o",
     "pokemon_id": "0783",
     "form": "hakamo-o",
-    "kind": "special",
+    "kind": "base",
     "image_path": "assets/pokemon-animated/0783_hakamo-o.webp",
     "bytes": 7494
   },
@@ -7355,7 +7355,7 @@
     "id": "0784_kommo-o",
     "pokemon_id": "0784",
     "form": "kommo-o",
-    "kind": "special",
+    "kind": "base",
     "image_path": "assets/pokemon-animated/0784_kommo-o.webp",
     "bytes": 9622
   },
@@ -8059,7 +8059,7 @@
     "id": "0866_mr_rime",
     "pokemon_id": "0866",
     "form": "mr_rime",
-    "kind": "special",
+    "kind": "base",
     "image_path": "assets/pokemon-animated/0866_mr_rime.webp",
     "bytes": 6174
   },
