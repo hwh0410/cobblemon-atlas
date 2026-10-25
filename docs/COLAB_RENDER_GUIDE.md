@@ -32,8 +32,10 @@ ls -lh colab-transfer
 1. 在 GitHub 開啟 `notebooks/Cobblemon_Colab_Render.ipynb`，再用 Colab 開啟 Notebook。
 2. 掛載 Google Drive；在授權畫面自行確認權限。
 3. 依序執行 Notebook：稀疏下載程式、解壓本機暫存、讀 Manifest、`--dry-run`、CPU 渲染、GPU 微基準、結果核對。
-4. 預設先測 `0130_gyarados_mega` 與 `0249_lugia` 的少量動作。要擴大批次，修改 Notebook 最上方的 `FORMS` 和 `ACTIONS`。
+4. 最新版 Notebook 目前預設執行洛奇亞修復批次：`0249_lugia` 的 `air_idle`、`air_fly`。來源檢查會要求兩個動作選中 `merged_pack` 且匹配到動態骨骼；否則直接停止，不會反覆產出靜態影格。
 5. `--sync-root` 在每個渲染 job 後同步 WebP 與 `render-jobs.json` 到 Drive。下次啟動會讀回 checkpoint 並按工作雜湊跳過已完成檔案。
+
+修復批次亦會將精確來源與動態骨骼診斷寫到 `reports/source-selection-lugia.json`。若需要擴大批次，修改 Notebook 開頭 `FORMS` 和 `ACTIONS`，並保留來源驗證；若選到其他已確認有意義的靜態姿勢，需另外建立明確的靜態輸出策略，不可直接取消 WebP 動態品質閘門。
 
 ## CPU/GPU 實驗範圍
 
