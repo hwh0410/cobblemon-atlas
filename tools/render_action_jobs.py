@@ -101,15 +101,37 @@ def inspect_frames(frames, minimum):
     for frame in frames[1:]:
         diff = ImageChops.difference(first, frame.convert("RGBA"))
         changed.append(int(np.count_nonzero(np.max(np.asarray(diff), axis=2) > 10)))
-    alpha = np.asarray(first.getchannel("A"))
-    bbox = first.getchannel("A").getbbox()
+    boxes = [f.convert("RGBA").getchannel("A").getbbox() for f in frames]
+    boxes = [b for b in boxes if b]
+    bbox = ((min(b[0] for b in boxes), min(b[1] for b in boxes),
+             max(b[2] for b in boxes), max(b[3] for b in boxes)) if boxes else None)
     edges = 0
-    if alpha.size:
-        edges = int(sum(map(np.count_nonzero, (alpha[0, :], alpha[-1, :], alpha[:, 0], alpha[:, -1]))))
+    for frame in frames:
+        alpha = np.asarray(frame.convert("RGBA").getchannel("A"))
+        if alpha.size:
+            edges += int(sum(map(np.count_nonzero, (alpha[0, :], alpha[-1, :], alpha[:, 0], alpha[:, -1]))))
+    margin = (min(bbox[0], bbox[1], first.width - bbox[2], first.height - bbox[3])
+              if bbox else 0)
     return dict(changed_pixels_max=max(changed, default=0),
-                n_frames=len(frames), alpha_bbox=bbox, edge_alpha_pixels=edges,
+                n_frames=len(frames), alpha_bbox=bbox, edge_alpha_pixels=edges, min_margin_px=margin,
                 motion_pass=max(changed, default=0) >= minimum,
                 visible=bool(bbox))
+
+
+def adjust_fixed_camera(info, bbox, size):
+    """Conservative zoom-out and re-center after an edge-touching pilot render."""
+    if not bbox:
+        return
+    shift_unit = size * 11.25 / 25.0
+    cx = (bbox[0] + bbox[2]) / 2
+    cy = (bbox[1] + bbox[3]) / 2
+    tr = list(info.get("profileTranslation") or [0, 0, 0])
+    while len(tr) < 3:
+        tr.append(0)
+    tr[0] -= .8 * (cx - size / 2) / shift_unit
+    tr[1] -= .8 * (cy - size / 2) / shift_unit
+    info["profileTranslation"] = tr
+    info["profileScale"] = float(info.get("profileScale") or 1.0) * .85
 
 
 def main(argv=None):
@@ -126,10 +148,12 @@ def main(argv=None):
     p.add_argument("--ss", type=int, default=2)
     p.add_argument("--quality", type=int, default=90)
     p.add_argument("--min-motion-pixels", type=int, default=12)
+    p.add_argument("--frame-padding", type=int, default=6, help="Minimum clear pixels on all sides")
+    p.add_argument("--auto-frame-attempts", type=int, default=4, help="Max fixed-camera framing passes")
     p.add_argument("--overwrite", action="store_true", help="Explicitly replace action outputs")
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args(argv)
-    if not (1 <= args.fps <= 30 and .1 <= args.seconds <= 10 and 64 <= args.size <= 1024 and 1 <= args.ss <= 4 and 1 <= args.quality <= 100):
+    if not (1 <= args.fps <= 30 and .1 <= args.seconds <= 10 and 64 <= args.size <= 1024 and 1 <= args.ss <= 4 and 1 <= args.quality <= 100 and 0 <= args.frame_padding <= 32 and 1 <= args.auto_frame_attempts <= 8):
         p.error("fps/seconds/size/ss/quality out of range")
     repo = args.repo.expanduser().resolve()
     renderer_path = (args.renderer or repo / "tools/render_portraits.py").expanduser().resolve()
@@ -180,7 +204,8 @@ def main(argv=None):
             continue
         source = source_root / relative
         preset = dict(fps=args.fps, seconds=args.seconds, size=args.size, ss=args.ss, quality=args.quality,
-                      frame="cobblemon", source_sha=action["animation_sha256"], job=action["render_job_key"],
+                      frame="cobblemon-adaptive-v2", padding=args.frame_padding,
+                      passes=args.auto_frame_attempts, source_sha=action["animation_sha256"], job=action["render_job_key"],
                       renderer_sha=hashlib.sha256(renderer_path.read_bytes()).hexdigest())
         job_key = sha(json.dumps(preset, sort_keys=True))
         job_id = f"{form}/{aid}"
@@ -227,17 +252,27 @@ def main(argv=None):
             started = time.monotonic()
             count = max(2, round(args.fps * args.seconds))
             try:
-                for frame_no in range(count):
-                    state["time"] = (frame_no / (count if state["loop"] else max(1, count - 1))) * state["period"]
-                    im, _ = renderer.render_species(form, size=args.size, ss=args.ss, frame="cobblemon")
-                    frames.append(im.convert("RGBA"))
+                for attempt in range(1, args.auto_frame_attempts + 1):
+                    frames = []
+                    for frame_no in range(count):
+                        state["time"] = (frame_no / (count if state["loop"] else max(1, count - 1))) * state["period"]
+                        im, _ = renderer.render_species(form, size=args.size, ss=args.ss, frame="cobblemon")
+                        frames.append(im.convert("RGBA"))
+                    stats = inspect_frames(frames, args.min_motion_pixels)
+                    print(f"  framing {attempt}/{args.auto_frame_attempts}: bbox={stats['alpha_bbox']} margin={stats['min_margin_px']} motion={stats['changed_pixels_max']}", flush=True)
+                    if not stats["visible"] or not stats["motion_pass"] or stats["min_margin_px"] >= args.frame_padding:
+                        break
+                    if attempt < args.auto_frame_attempts:
+                        adjust_fixed_camera(info, stats["alpha_bbox"], args.size)
             finally:
                 renderer.find_animations = old_find
-            stats = inspect_frames(frames, args.min_motion_pixels)
+            stats["framing_attempts"] = attempt
+            stats["final_profile_scale"] = info["profileScale"]
+            stats["final_profile_translation"] = info.get("profileTranslation")
             if not stats["visible"] or not stats["motion_pass"]:
                 status = "static" if stats["visible"] else "failed"
                 reason = "no_visible_frame_motion" if stats["visible"] else "empty_render"
-            elif stats["edge_alpha_pixels"]:
+            elif stats["min_margin_px"] < args.frame_padding:
                 status, reason = "failed", "touches_canvas_edge_review_crop"
             else:
                 dest.parent.mkdir(parents=True, exist_ok=True)
