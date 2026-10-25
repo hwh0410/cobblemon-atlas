@@ -1,0 +1,393 @@
+{
+  "source": "User-supplied 55-row Cobblemon normal-form audit, 2026-10-25",
+  "warning": "Model, PNG and resolver counts do not establish renderability. The review list does not contain generated images. Multi-form defaults must be verified with resolver data.",
+  "total": 55,
+  "reclassified": 8,
+  "entries": [
+    {
+      "pokemon_id": "0003",
+      "id": "0003_venusaur",
+      "form": "venusaur",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0012",
+      "id": "0012_butterfree",
+      "form": "butterfree",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0019",
+      "id": "0019_rattata",
+      "form": "rattata",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0020",
+      "id": "0020_raticate",
+      "form": "raticate",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0025",
+      "id": "0025_pikachu",
+      "form": "pikachu",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0026",
+      "id": "0026_raichu",
+      "form": "raichu",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0065",
+      "id": "0065_alakazam",
+      "form": "alakazam",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0122",
+      "id": "0122_mr. mime",
+      "form": "mr. mime",
+      "status": "existing_webp_reclassified",
+      "existing_webp_id": "0122_mr_mime"
+    },
+    {
+      "pokemon_id": "0130",
+      "id": "0130_gyarados",
+      "form": "gyarados",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0133",
+      "id": "0133_eevee",
+      "form": "eevee",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0194",
+      "id": "0194_wooper",
+      "form": "wooper",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0201",
+      "id": "0201_unown",
+      "form": "unown",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0208",
+      "id": "0208_steelix",
+      "form": "steelix",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0212",
+      "id": "0212_scizor",
+      "form": "scizor",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0214",
+      "id": "0214_heracross",
+      "form": "heracross",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0229",
+      "id": "0229_houndoom",
+      "form": "houndoom",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0250",
+      "id": "0250_ho-oh",
+      "form": "ho-oh",
+      "status": "existing_webp_reclassified",
+      "existing_webp_id": "0250_ho_oh"
+    },
+    {
+      "pokemon_id": "0257",
+      "id": "0257_blaziken",
+      "form": "blaziken",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0308",
+      "id": "0308_medicham",
+      "form": "medicham",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0398",
+      "id": "0398_staraptor",
+      "form": "staraptor",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0412",
+      "id": "0412_burmy",
+      "form": "burmy",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0413",
+      "id": "0413_wormadam",
+      "form": "wormadam",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0421",
+      "id": "0421_cherrim",
+      "form": "cherrim",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0422",
+      "id": "0422_shellos",
+      "form": "shellos",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0423",
+      "id": "0423_gastrodon",
+      "form": "gastrodon",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0439",
+      "id": "0439_mime jr.",
+      "form": "mime jr.",
+      "status": "existing_webp_reclassified",
+      "existing_webp_id": "0439_mime_jr"
+    },
+    {
+      "pokemon_id": "0445",
+      "id": "0445_garchomp",
+      "form": "garchomp",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0460",
+      "id": "0460_abomasnow",
+      "form": "abomasnow",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0474",
+      "id": "0474_porygon-z",
+      "form": "porygon-z",
+      "status": "existing_webp_reclassified",
+      "existing_webp_id": "0474_porygon-z"
+    },
+    {
+      "pokemon_id": "0521",
+      "id": "0521_unfezant",
+      "form": "unfezant",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0550",
+      "id": "0550_basculin",
+      "form": "basculin",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0586",
+      "id": "0586_sawsbuck",
+      "form": "sawsbuck",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0592",
+      "id": "0592_frillish",
+      "form": "frillish",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0593",
+      "id": "0593_jellicent",
+      "form": "jellicent",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0668",
+      "id": "0668_pyroar",
+      "form": "pyroar",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0678",
+      "id": "0678_meowstic",
+      "form": "meowstic",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0692",
+      "id": "0692_clauncher",
+      "form": "clauncher",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0693",
+      "id": "0693_clawitzer",
+      "form": "clawitzer",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0720",
+      "id": "0720_hoopa",
+      "form": "hoopa",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0741",
+      "id": "0741_oricorio",
+      "form": "oricorio",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0745",
+      "id": "0745_lycanroc",
+      "form": "lycanroc",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0746",
+      "id": "0746_wishiwashi",
+      "form": "wishiwashi",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0782",
+      "id": "0782_jangmo-o",
+      "form": "jangmo-o",
+      "status": "existing_webp_reclassified",
+      "existing_webp_id": "0782_jangmo-o"
+    },
+    {
+      "pokemon_id": "0783",
+      "id": "0783_hakamo-o",
+      "form": "hakamo-o",
+      "status": "existing_webp_reclassified",
+      "existing_webp_id": "0783_hakamo-o"
+    },
+    {
+      "pokemon_id": "0784",
+      "id": "0784_kommo-o",
+      "form": "kommo-o",
+      "status": "existing_webp_reclassified",
+      "existing_webp_id": "0784_kommo-o"
+    },
+    {
+      "pokemon_id": "0849",
+      "id": "0849_toxtricity",
+      "form": "toxtricity",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0866",
+      "id": "0866_mr. rime",
+      "form": "mr. rime",
+      "status": "existing_webp_reclassified",
+      "existing_webp_id": "0866_mr_rime"
+    },
+    {
+      "pokemon_id": "0875",
+      "id": "0875_eiscue",
+      "form": "eiscue",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0876",
+      "id": "0876_indeedee",
+      "form": "indeedee",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0902",
+      "id": "0902_basculegion",
+      "form": "basculegion",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0916",
+      "id": "0916_oinkologne",
+      "form": "oinkologne",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0964",
+      "id": "0964_palafin",
+      "form": "palafin",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0982",
+      "id": "0982_dudunsparce",
+      "form": "dudunsparce",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "0999",
+      "id": "0999_gimmighoul",
+      "form": "gimmighoul",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    },
+    {
+      "pokemon_id": "1017",
+      "id": "1017_ogerpon",
+      "form": "ogerpon",
+      "status": "pending_resolver_review",
+      "existing_webp_id": null
+    }
+  ]
+}
