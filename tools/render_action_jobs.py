@@ -132,7 +132,9 @@ def adjust_fixed_camera(info, bbox, size):
     tr[0] -= .8 * (cx - size / 2) / shift_unit
     tr[1] -= .8 * (cy - size / 2) / shift_unit
     info["profileTranslation"] = tr
-    info["profileScale"] = float(info.get("profileScale") or 1.0) * .85
+    # Stronger zoom-out is needed for wide wings/turning bodies (notably Lugia).
+    # Each trial still keeps the whole animation on one fixed camera.
+    info["profileScale"] = float(info.get("profileScale") or 1.0) * .80
 
 
 def choose_actions(entries, forms, requested):
@@ -183,7 +185,7 @@ def main(argv=None):
     p.add_argument("--quality", type=int, default=90)
     p.add_argument("--min-motion-pixels", type=int, default=12)
     p.add_argument("--frame-padding", type=int, default=6, help="Minimum clear pixels on all sides")
-    p.add_argument("--auto-frame-attempts", type=int, default=4, help="Max fixed-camera framing passes")
+    p.add_argument("--auto-frame-attempts", type=int, default=8, help="Max fixed-camera framing passes")
     p.add_argument("--overwrite", action="store_true", help="Explicitly replace action outputs")
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args(argv)
