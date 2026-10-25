@@ -4,7 +4,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from render_action_jobs import atomic_json, channel_sampler, inspect_frames, adjust_fixed_camera, choose_actions
+from render_action_jobs import atomic_json, channel_sampler, inspect_frames, adjust_fixed_camera, choose_actions, ranked_poser_paths
 
 
 class FakeRenderer:
@@ -24,6 +24,21 @@ class RenderActionTests(unittest.TestCase):
         self.assertEqual(selected[0][2],"air_idle")
         exact = choose_actions(entries,{"0249_lugia"},["air_idle_abcd1234"])
         self.assertEqual(exact[0][2],"air_idle_abcd1234")
+    def test_species_poser_wins_over_mega(self):
+        posers = [
+            "bedrock/pokemon/posers/0384_rayquaza/megarayquaza.json",
+            "bedrock/pokemon/posers/0384_rayquaza/rayquaza.json",
+            "bedrock/pokemon/posers/0384_rayquaza/rayquaza2.json",
+        ]
+        self.assertEqual(Path(ranked_poser_paths(posers, "0384_rayquaza")[0]).stem, "rayquaza")
+
+    def test_mega_does_not_get_normal_species_pushed_after_unrelated(self):
+        posers = [
+            "bedrock/pokemon/posers/0130_gyarados/gyarados.json",
+            "bedrock/pokemon/posers/0130_gyarados/other.json",
+        ]
+        self.assertEqual(Path(ranked_poser_paths(posers, "0130_gyarados_mega")[0]).stem, "gyarados")
+
     def test_interpolate(self):
         state = {"time": 0.5, "period": 1.0, "loop": False}
         sample = channel_sampler(FakeRenderer(), state)
