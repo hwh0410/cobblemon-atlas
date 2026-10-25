@@ -51,3 +51,18 @@ ls -lh colab-transfer
 在 Drive `renders/{form_id}/{action_id}.webp` 中檢查檔案，並讀取 `checkpoints/render-jobs.json`：`ready` 只代表通過影格、動態、裁切及編碼檢查；仍需人工確認姿勢語義與特殊形態骨骼。
 
 如果源資源包變動，重新跑 Mac 掃描器、上傳新 Manifest 和壓縮包；不要依舊版 hash 繼續渲染。
+
+## 10 隻 × 3 動作批次壓力測試
+
+[開啟批次 Colab Notebook](https://colab.research.google.com/github/hwh0410/cobblemon-atlas/blob/feat/animation-manifest-scanner-phase1/notebooks/Cobblemon_Colab_Batch_Pilot.ipynb)
+
+此 Notebook 不改動既有洛奇亞修復版 Notebook。會先從 Manifest 挑選 10 個形態（不足時自動補足），每個挑選 3 個有動態骨骼匹配的動作，優先涵蓋待機、移動、戰鬥。這是初步篩選，仍須真正渲染與解碼確認動態。
+
+輸出使用 Google Drive `Cobblemon_Atlas`，仍是 CPU 真正渲染 224px / 12fps / 2 秒 / SS2。GPU 原型僅測光柵化算術，不代表整體渲染加速。
+
+- `reports/batch-pilot-10-plan.json`：形態、動作、來源及匹配骨骼
+- `reports/batch-pilot-10-summary.json`：僅統計本次選定的 30 個動作品質結果及耗時
+- `renders/{form_id}/{action_id}.webp`：通過驗證的輸出
+- `checkpoints/render-jobs.json`：續跑狀態
+
+每隻形態各執行一次 renderer，避免 forms × actions 意外交叉組合。已完成且工作簽章一致的結果會續用；遇到失敗將保留報告，不會將有裁切或靜態失敗的 WebP 發布到站點。Notebook 需要使用者在 Colab 登入並啟動執行階段。
