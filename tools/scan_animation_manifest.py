@@ -325,7 +325,8 @@ def main(argv=None):
         f"{r['pack']}:{r['relative']}:{r['sha256']}" for r in sorted(records, key=lambda r: (r["pack"], r["relative"]))
     ).encode()).hexdigest()
     index_hash = digest(args.index)
-    fingerprint = hashlib.sha256((source_version + index_hash).encode()).hexdigest()
+    # Scanner logic changes must invalidate --resume results as well.
+    fingerprint = hashlib.sha256((source_version + index_hash + digest(Path(__file__))).encode()).hexdigest()
     entries = []
     reused = 0
     for f in forms:
