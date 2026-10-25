@@ -25,10 +25,11 @@ const nameOf=s=>String(s||"").replace(/[_-]+/g," ").replace(/\b\w/g,c=>c.toUpper
 let zhNames=[];
 const chineseOf=r=>zhNames[Number(r.pokemon_id)-1]||"";
 const displayOf=r=>chineseOf(r)||nameOf(r.form);
-const smallFile=r=>typeof r.bytes==="number"&&r.bytes<15000;
+const smallFile=r=>!r.missing&&typeof r.bytes==="number"&&r.bytes<15000;
 const numberOf=r=>String(Number(r.pokemon_id)).padStart(4,"0");
-const linkOf=r=>"../"+r.image_path;
+const linkOf=r=>r.missing?"":"../"+r.image_path;
 let entries=[],filtered=[],page=0,selected=null;
+const missingBase=[{id:"0001_bulbasaur",pokemon_id:"0001",form:"bulbasaur"},{id:"0002_ivysaur",pokemon_id:"0002",form:"ivysaur"},{id:"0003_venusaur",pokemon_id:"0003",form:"venusaur"}];
 const PER_PAGE=40;
 const groups=new Map();
 function redraw(){
@@ -44,9 +45,9 @@ function redraw(){
    const card=document.createElement("button");card.type="button";card.className="mon";
    card.setAttribute("aria-label",displayOf(r)+"，"+nameOf(r.form)+"，查看其他形態");
    const photo=document.createElement("div");photo.className="photo";
-   const img=document.createElement("img");img.src=linkOf(r);img.loading="lazy";img.decoding="async";img.alt="";
+   const img=document.createElement("img");if(!r.missing)img.src=linkOf(r);img.loading="lazy";img.decoding="async";img.alt="";
    img.onerror=()=>{img.style.display="none";photo.textContent="圖片暫不可用"};
-   photo.append(img);
+   if(r.missing){photo.textContent="動畫待補";}else{photo.append(img)}
    const n=document.createElement("div");n.className="number";n.textContent="#"+numberOf(r);
    const title=document.createElement("div");title.className="name";title.textContent=displayOf(r);
    const label=document.createElement("div");label.className="tag";label.textContent=r.kind==="base"?"BASE FORM":"VARIANT";
@@ -58,13 +59,13 @@ function redraw(){
 function choose(r){
  selected=r;$("#detailNo").textContent="#"+numberOf(r);
  $("#detailName").textContent=displayOf(r);
- $("#detailImg").src=linkOf(r);
- $("#detailForm").textContent="形態 ID："+r.id+" · "+nameOf(r.form)+" · "+(r.kind==="base"?"一般形態":"特殊／變種形態")+(smallFile(r)?" · 圖片大小異常偏小，待人工確認":"");
+ $("#detailImg").hidden=!!r.missing;if(!r.missing)$("#detailImg").src=linkOf(r);
+ $("#detailForm").textContent=(r.missing?"目前尚無原生 WebP。可先使用首頁圖鑑的查詢與指令功能。 · ":"")+"形態 ID："+r.id+" · "+nameOf(r.form)+" · "+(r.kind==="base"?"一般形態":"特殊／變種形態")+(smallFile(r)?" · 圖片大小異常偏小，待人工確認":"");
  const frag=document.createDocumentFragment();
  for(const row of groups.get(r.pokemon_id)||[]){
   const b=document.createElement("button");b.type="button";b.className="variant";b.setAttribute("aria-pressed",String(row.id===r.id));
-  const img=document.createElement("img");img.src=linkOf(row);img.loading="lazy";img.alt="";
-  const label=document.createElement("span");label.textContent=nameOf(row.form);b.append(img,label);b.onclick=()=>choose(row);frag.append(b);
+  const img=document.createElement("img");if(!row.missing)img.src=linkOf(row);img.loading="lazy";img.alt="";
+  const label=document.createElement("span");label.textContent=nameOf(row.form);if(!row.missing)b.append(img);b.append(label);b.onclick=()=>choose(row);frag.append(b);
  }
  $("#variants").replaceChildren(frag);
 }
@@ -80,9 +81,10 @@ $("#next").onclick=()=>{page++;redraw();window.scrollTo({top:0,behavior:"smooth"
  const resp=await fetch("../data/pokemon-animated.json",{cache:"no-cache"});if(!resp.ok)throw Error("HTTP "+resp.status);
  const data=await resp.json();if(!Array.isArray(data))throw Error("索引格式不正確");
  entries=data.filter(r=>/^\d{4}_[a-z0-9_-]+$/.test(r.id)&&/^assets\/pokemon-animated\/[a-z0-9_-]+\.webp$/.test(r.image_path));
+ for(const row of missingBase){if(!entries.some(x=>x.id===row.id))entries.push({...row,kind:"base",missing:true,bytes:0,image_path:""})}
  for(const r of entries){if(!groups.has(r.pokemon_id))groups.set(r.pokemon_id,[]);groups.get(r.pokemon_id).push(r)}
  for(const rows of groups.values())rows.sort((a,b)=>(a.kind==="base"?-1:1)-(b.kind==="base"?-1:1));
- $("#stat").textContent=entries.length+" 動態形態 · "+groups.size+" 個全國圖鑑編號";
+ $("#stat").textContent=data.length+" 個已收錄 WebP · "+missingBase.filter(r=>entries.some(x=>x.id===r.id&&x.missing)).length+" 個待補動畫";
  try{const namesResponse=await fetch("../../data/names-zh-hant.json");if(namesResponse.ok){const names=await namesResponse.json();if(Array.isArray(names))zhNames=names}}catch(e){console.warn("中文名稱讀取失敗，保留英文",e)}
  redraw();
  const target=new URLSearchParams(location.search).get("pokemon");
