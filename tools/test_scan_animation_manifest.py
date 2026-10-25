@@ -4,10 +4,24 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scan_animation_manifest import main, references, value_digest
+from scan_animation_manifest import main, references, value_digest, poser_uses
 
 
 class ManifestTests(unittest.TestCase):
+    def test_poser_context_and_riding_condition(self):
+        poser = {"poses": {
+            "hovering": {"poseTypes": ["HOVER"], "animations": [
+                "q.bedrock('gyarados', 'air_idle')",
+                {"animation": "q.bedrock('gyarados', 'ride_air_fly')", "condition": "q.is_ridden"}
+            ], "quirks": ["q.bedrock_quirk('gyarados', 'blink')"]},
+            "battle-standing": {"animations": ["q.bedrock('gyarados', 'battle_idle')"]}
+        }}
+        uses = poser_uses(poser)
+        self.assertEqual(uses["animation.gyarados.air_idle"][0]["pose"], "hovering")
+        self.assertEqual(uses["animation.gyarados.ride_air_fly"][0]["condition"], "q.is_ridden")
+        self.assertEqual(uses["animation.gyarados.blink"][0]["role"], "bedrock_quirk")
+        self.assertEqual(uses["animation.gyarados.battle_idle"][0]["pose"], "battle-standing")
+
     def test_clip_hash_ignores_json_key_order(self):
         self.assertEqual(value_digest({"bones": {"body": {"rotation": [0, 1, 0]}}, "loop": True}),
                          value_digest({"loop": True, "bones": {"body": {"rotation": [0, 1, 0]}}}))
