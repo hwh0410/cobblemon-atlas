@@ -4,7 +4,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from render_action_jobs import atomic_json, channel_sampler, inspect_frames, adjust_fixed_camera
+from render_action_jobs import atomic_json, channel_sampler, inspect_frames, adjust_fixed_camera, choose_actions
 
 
 class FakeRenderer:
@@ -14,6 +14,16 @@ class FakeRenderer:
 
 
 class RenderActionTests(unittest.TestCase):
+    def test_prefer_dynamic_duplicate_but_allow_exact_variant(self):
+        entries = [{"form_id":"0249_lugia","actions":[
+            {"id":"air_idle","clip_key":"animation.lugia.air_idle","source_pack":"development_resource_packs","model_bones_matched":0,"dynamic_bones":0,"evidence":"audit"},
+            {"id":"air_idle_abcd1234","clip_key":"animation.lugia.air_idle","source_pack":"merged_pack","model_bones_matched":48,"dynamic_bones":49,"evidence":"audit"}
+        ]}]
+        selected = choose_actions(entries,{"0249_lugia"},["air_idle"])
+        self.assertEqual(selected[0][1]["source_pack"],"merged_pack")
+        self.assertEqual(selected[0][2],"air_idle")
+        exact = choose_actions(entries,{"0249_lugia"},["air_idle_abcd1234"])
+        self.assertEqual(exact[0][2],"air_idle_abcd1234")
     def test_interpolate(self):
         state = {"time": 0.5, "period": 1.0, "loop": False}
         sample = channel_sampler(FakeRenderer(), state)
