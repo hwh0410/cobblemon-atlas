@@ -135,6 +135,38 @@ def adjust_fixed_camera(info, bbox, size):
     info["profileScale"] = float(info.get("profileScale") or 1.0) * .85
 
 
+def choose_actions(entries, forms, requested):
+    """Resolve duplicate clip versions by motion evidence, retaining explicit hashed IDs."""
+    chosen = {}
+    for entry in entries:
+        form = entry["form_id"]
+        if form not in forms:
+            continue
+        for token in requested:
+            explicit = [a for a in entry["actions"] if a["id"] == token]
+            if explicit and re.search(r"_[0-9a-f]{8}$", token):
+                candidates = explicit
+                output_id = token
+            else:
+                candidates = [a for a in entry["actions"] if
+                              a["clip_key"] == token or
+                              a["clip_key"].rsplit(".", 1)[-1] == token]
+                if not candidates:
+                    candidates = explicit
+                output_id = token.rsplit(".", 1)[-1]
+            if not candidates:
+                continue
+            best = max(candidates, key=lambda a: (
+                a.get("model_bones_matched", 0) > 0,
+                a.get("model_bones_matched", 0),
+                a.get("dynamic_bones", 0),
+                a.get("evidence") == "candidate",
+                a.get("source_pack") == "merged_pack",
+                a.get("clip_sha256", "")))
+            chosen[(form, output_id)] = (entry, best, output_id)
+    return list(chosen.values())
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--repo", type=Path, required=True, help="Local cobblemon-bedrock root")
@@ -160,13 +192,7 @@ def main(argv=None):
     repo = args.repo.expanduser().resolve()
     renderer_path = (args.renderer or repo / "tools/render_portraits.py").expanduser().resolve()
     index = json.loads(args.manifest.expanduser().read_text(encoding="utf-8"))
-    chosen = []
-    for entry in index.get("entries", []):
-        if entry["form_id"] not in args.forms:
-            continue
-        for action in entry["actions"]:
-            if action["id"] in args.actions or action["clip_key"] in args.actions:
-                chosen.append((entry, action))
+    chosen = choose_actions(index.get("entries", []), set(args.forms), args.actions)
     if not chosen:
         p.error("No matching form/action pairs in Manifest")
     out_dir = (args.out or repo / "captures/atlas_action_pilot").expanduser().resolve()
@@ -176,8 +202,8 @@ def main(argv=None):
     sync_root = args.sync_root.expanduser().resolve() if args.sync_root else None
     if sync_root and (sync_root == legacy_root or legacy_root in sync_root.parents):
         p.error("Cannot sync into the legacy WebP folder")
-    for entry, action in chosen:
-        print(f"{entry['form_id']}: {action['id']} ({action['clip_key']}) | {action['source_pack']} | {action['evidence']}")
+    for entry, action, output_id in chosen:
+        print(f"{entry['form_id']}: {output_id} ({action['clip_key']}) | {action['source_pack']} | {action['evidence']} | manifest_id={action['id']}")
     if args.dry_run:
         return 0
     if not renderer_path.is_file():
@@ -200,8 +226,8 @@ def main(argv=None):
     results = json.loads(result_file.read_text(encoding="utf-8")) if result_file.exists() else {"schema_version": 1, "jobs": {}}
     out_dir.mkdir(parents=True, exist_ok=True)
     errors = 0
-    for entry, action in chosen:
-        form, aid = entry["form_id"], action["id"]
+    for entry, action, output_id in chosen:
+        form, aid = entry["form_id"], output_id
         if not SAFE.fullmatch(form) or not SAFE.fullmatch(aid):
             print("SKIP unsafe ID", form, aid)
             errors += 1
