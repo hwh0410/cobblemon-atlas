@@ -263,6 +263,6 @@ function showTab(name){for(const id of ["pokedex","dex-results","forms","items",
  document.querySelectorAll("[data-tab-link]").forEach(a=>{a.classList.toggle("active",a.dataset.tabLink===name);a.setAttribute("aria-current",a.dataset.tabLink===name?"page":"false")})}
 function tabFromHash(){let x=location.hash.slice(1);return ["forms","items","guide","commands"].includes(x)?x:"pokedex"}
 addEventListener("hashchange",()=>showTab(tabFromHash()));showTab(tabFromHash());
-fetch("mega-showdown/data/items.json").then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(x=>{itemEntries=x.item_entries||[];renderItems();renderGuideItems();renderForms()}).catch(e=>{$("#itemCount").textContent="道具資料暫時無法載入";console.error(e)});
+fetch("mega-showdown/data/items.json").then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(x=>{itemEntries=x.item_entries||[];renderItems();renderGuideItems();renderForms();try{const query=sessionStorage.getItem("atlas-item-search");if(query){sessionStorage.removeItem("atlas-item-search");$("#itemSearch").value=query;renderItems();showTab("items")}}catch(e){console.warn("無法還原道具搜尋",e)}}).catch(e=>{$("#itemCount").textContent="道具資料暫時無法載入";console.error(e)});
 </script>
 <div id="toast" class="toast" hidden role="status"></div></body></html>
