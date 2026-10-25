@@ -13,6 +13,7 @@ import json
 import math
 import os
 import re
+import shutil
 import sys
 import tempfile
 import time
@@ -142,6 +143,7 @@ def main(argv=None):
     p.add_argument("--forms", nargs="+", required=True)
     p.add_argument("--actions", nargs="+", required=True, help="Action IDs or exact clip keys")
     p.add_argument("--out", type=Path, help="Dedicated local output folder")
+    p.add_argument("--sync-root", type=Path, help="Mounted Drive folder with renders/ and checkpoints/; mirror each completed job")
     p.add_argument("--fps", type=int, default=12)
     p.add_argument("--seconds", type=float, default=2)
     p.add_argument("--size", type=int, default=224)
@@ -171,6 +173,9 @@ def main(argv=None):
     legacy_root = (repo / "mega-showdown/assets/pokemon-animated").resolve()
     if out_dir == legacy_root or legacy_root in out_dir.parents:
         p.error("Cannot write to legacy pokemon-animated directory")
+    sync_root = args.sync_root.expanduser().resolve() if args.sync_root else None
+    if sync_root and (sync_root == legacy_root or legacy_root in sync_root.parents):
+        p.error("Cannot sync into the legacy WebP folder")
     for entry, action in chosen:
         print(f"{entry['form_id']}: {action['id']} ({action['clip_key']}) | {action['source_pack']} | {action['evidence']}")
     if args.dry_run:
@@ -187,6 +192,11 @@ def main(argv=None):
         "development_resource_packs": repo / "development_resource_packs",
     }
     result_file = out_dir / "render-jobs.json"
+    if sync_root and not result_file.exists():
+        checkpoint = sync_root / "checkpoints/render-jobs.json"
+        if checkpoint.is_file():
+            result_file.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(checkpoint, result_file)
     results = json.loads(result_file.read_text(encoding="utf-8")) if result_file.exists() else {"schema_version": 1, "jobs": {}}
     out_dir.mkdir(parents=True, exist_ok=True)
     errors = 0
@@ -211,6 +221,11 @@ def main(argv=None):
         job_id = f"{form}/{aid}"
         dest = out_dir / form / (aid + ".webp")
         previous = results["jobs"].get(job_id, {})
+        if sync_root and not dest.exists() and previous.get("status") == "ready" and previous.get("job_key") == job_key:
+            remote = sync_root / "renders" / form / (aid + ".webp")
+            if remote.is_file():
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(remote, dest)
         if dest.exists() and not args.overwrite:
             if previous.get("job_key") == job_key and previous.get("status") == "ready":
                 print("RESUME already ready:", dest)
@@ -313,6 +328,17 @@ def main(argv=None):
             print("FAILED", job_id, record["reason"], flush=True)
         results["jobs"][job_id] = record
         atomic_json(result_file, results)
+        if sync_root:
+            try:
+                if record["status"] == "ready":
+                    target = sync_root / "renders" / form / (aid + ".webp")
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(dest, target)
+                atomic_json(sync_root / "checkpoints/render-jobs.json", results)
+                print("SYNCED Drive:", job_id, record["status"], flush=True)
+            except (OSError, ValueError) as exc:
+                print("DRIVE SYNC FAILED:", job_id, exc, flush=True)
+                errors += 1
         if record["status"] != "ready":
             errors += 1
     print("Report:", result_file)
