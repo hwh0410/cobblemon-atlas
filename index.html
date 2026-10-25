@@ -22,15 +22,31 @@
 .guide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.guide-card{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:20px}.guide-card h3{margin:0 0 10px}.guide-card p,.guide-card li{font-size:13px;color:var(--muted);line-height:1.7}.guide-card ol{padding-left:20px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:40;background:#243c33;color:white;padding:12px 17px;border-radius:8px;box-shadow:0 3px 20px #0002;max-width:90vw}
 @media(max-width:700px){.item-grid,.guide-grid{grid-template-columns:1fr}.topnav{gap:13px}.command-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.guide-related{margin-top:16px;padding-top:13px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px}.guide-related h4{flex:0 0 100%;font-size:12px;color:var(--muted);margin:0 0 2px}.guide-related .btn{background:var(--tint);border-color:#dec4b8;color:var(--red);font-size:12px;padding:8px 11px}.guide-related .btn:hover{background:#ead1c3}.guide-related .btn:disabled{opacity:.5;cursor:not-allowed}</style>
+.guide-related{margin-top:16px;padding-top:13px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px}.guide-related h4{flex:0 0 100%;font-size:12px;color:var(--muted);margin:0 0 2px}.guide-related .btn{background:var(--tint);border-color:#dec4b8;color:var(--red);font-size:12px;padding:8px 11px}.guide-related .btn:hover{background:#ead1c3}.guide-related .btn:disabled{opacity:.5;cursor:not-allowed}
+.form-filters{display:flex;gap:9px;margin:14px 0}.form-filters input{flex:1}.form-filters select{width:215px}
+.special-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:17px 0 28px}
+.special-card{border:1px solid var(--line);border-radius:9px;background:var(--card);padding:17px;min-width:0}
+.special-meta{color:var(--red);font-size:11px;font-weight:700}.special-card h3{margin:6px 0 2px;font-size:20px}
+.special-card .english{font-size:12px;color:var(--muted)}
+.special-pair{display:grid;grid-template-columns:1fr 1fr;border:1px solid #d5d8ce;margin:13px 0}
+.special-sprite{min-width:0;padding:10px 6px;text-align:center;background:#e9ece5}
+.special-sprite+ .special-sprite{background:#f1e3da;border-left:1px solid #d5d8ce}
+.special-sprite img{width:100%;height:135px;object-fit:contain}.special-sprite small{display:block;color:var(--muted);font-size:11px;overflow-wrap:anywhere}
+.special-unavailable{height:135px;display:grid;place-items:center;font-size:12px;color:var(--muted)}
+.special-tool{border-top:1px solid var(--line);padding-top:10px;display:flex;align-items:center;gap:10px}
+.special-tool img{width:34px;height:34px;object-fit:contain;image-rendering:pixelated}
+.special-tool .label{font-size:12px;flex:1;min-width:0}.special-tool .label small{display:block;color:var(--muted);font-size:10px;overflow-wrap:anywhere}
+.special-tool button{flex-shrink:0;padding:8px;font-size:11px}.special-tool .none{font-size:12px;color:var(--muted)}
+@media(max-width:730px){.special-grid{grid-template-columns:1fr}.form-filters{flex-direction:column}.form-filters select{width:100%}}
+</style>
 </head>
 <body>
-<header class="top"><div class="wrap"><a class="brand" href="./"><span>◉</span> COBBLEMON ATLAS</a><nav class="topnav"><a href="#pokedex" data-tab-link="pokedex">圖鑑</a><a href="#items" data-tab-link="items">道具</a><a href="#guide" data-tab-link="guide">玩法</a><a href="#commands" data-tab-link="commands">指令</a></nav></div></header>
+<header class="top"><div class="wrap"><a class="brand" href="./"><span>◉</span> COBBLEMON ATLAS</a><nav class="topnav"><a href="#pokedex" data-tab-link="pokedex">圖鑑</a><a href="#forms" data-tab-link="forms">特殊形態</a><a href="#items" data-tab-link="items">道具</a><a href="#guide" data-tab-link="guide">玩法</a><a href="#commands" data-tab-link="commands">指令</a></nav></div></header>
 <main>
 <section class="hero wrap"><div class="kicker">ALL IN ONE / COBBLEMON ATLAS</div><div class="kicker">MINECRAFT NATIVE / ANIMATED POKÉDEX</div><h1>讓寶可夢<br><em>動起來。</em></h1><p class="lead">整合 Cobblemon 1.8.2 與 Mega Showdown 1.3.2 的動態圖鑑、特殊形態、道具與複製指令。查詢及操作都在同一頁完成。</p><div class="stats"><span id="stat">載入圖鑑中…</span><span>COBBLEMON 1.8.2</span><span>MEGA SHOWDOWN 1.3.2</span></div></section>
 <section id="pokedex" class="controls app-section"><div class="wrap controlgrid"><input id="search" type="search" placeholder="中文／英文名稱、形態、編號（路卡利歐、Lucario、0448）" aria-label="搜尋寶可夢"><select id="kind" aria-label="形態篩選"><option value="all">所有形態</option><option value="base">一般形態</option><option value="special">特殊／變種</option></select><select id="quality" aria-label="圖片品質"><option value="all">所有圖片</option><option value="review">待檢查圖片</option><option value="regular">一般大小圖片</option></select><select id="order" aria-label="排序"><option value="number">按圖鑑編號</option><option value="name">按名稱排序</option></select><button id="clear" class="btn" type="button">清除篩選</button></div></section>
 <section class="wrap app-section" id="dex-results"><div class="results"><span id="count" aria-live="polite">正在讀取資料…</span><span>點擊卡片查看所有已收錄形態</span></div><div id="grid" class="grid"></div><div class="pager"><button class="btn" id="prev" type="button">← 上一頁</button><span id="page"></span><button class="btn" id="next" type="button">下一頁 →</button></div></section>
-<section class="wrap app-section extra" id="commands" hidden><div class="extrahead"><div class="kicker">QUICK ACTIONS</div><h2>常用遊戲指令</h2><p class="lead">點擊即可複製。需要開啟作弊功能或具備 OP 權限；模組版本或伺服器權限可能影響執行。</p></div><div class="command-list" id="commandList"></div></section><section class="wrap app-section extra" id="items" hidden><div class="extrahead"><div class="kicker">MEGA SHOWDOWN / ITEM INDEX</div><h2>道具與進化石</h2><p class="lead">搜尋中文版名稱、英文名稱、道具 ID；可一鍵複製 /give 指令。</p></div><input id="itemSearch" type="search" placeholder="搜尋道具、進化石、Red Orb、路卡利歐…"><p class="fine" id="itemCount"></p><div class="item-grid" id="itemGrid"></div><button id="moreItems" class="btn" type="button" hidden>載入更多道具</button></section><section class="wrap app-section extra" id="guide" hidden><div class="extrahead"><div class="kicker">GAME MECHANICS</div><h2>特殊機制與操作教學</h2><p class="lead">超級進化、原始回歸、神獸融合、Z 招式、極巨化與太晶化。</p></div><div id="guideList" class="guide-grid"></div></section></main>
+<section class="wrap app-section extra" id="forms" hidden><div class="extrahead"><div class="kicker">SPECIAL FORMS / MINECRAFT WEBP</div><h2>特殊形態圖鑑</h2><p class="lead">保留原本「一般形態 vs 特殊形態」的雙圖比較版型，顯示目前已渲染的形態。對應道具僅在資料能確認時提供。</p></div><div class="form-filters"><input id="formSearch" type="search" placeholder="搜尋中文、英文、編號或形態…"><select id="formType" aria-label="特殊形態類型"><option value="all">全部形態</option><option value="mega">超級進化</option><option value="gmax">超極巨化</option><option value="regional">地區形態</option><option value="primal">原始回歸</option><option value="fusion">融合與特殊變化</option><option value="other">其他變種</option></select></div><p class="fine" id="formCount">載入中…</p><div class="special-grid" id="formGrid"></div><div class="pager"><button class="btn" id="moreForms" type="button" hidden>載入更多形態</button></div></section><section class="wrap app-section extra" id="commands" hidden><div class="extrahead"><div class="kicker">QUICK ACTIONS</div><h2>常用遊戲指令</h2><p class="lead">點擊即可複製。需要開啟作弊功能或具備 OP 權限；模組版本或伺服器權限可能影響執行。</p></div><div class="command-list" id="commandList"></div></section><section class="wrap app-section extra" id="items" hidden><div class="extrahead"><div class="kicker">MEGA SHOWDOWN / ITEM INDEX</div><h2>道具與進化石</h2><p class="lead">搜尋中文版名稱、英文名稱、道具 ID；可一鍵複製 /give 指令。</p></div><input id="itemSearch" type="search" placeholder="搜尋道具、進化石、Red Orb、路卡利歐…"><p class="fine" id="itemCount"></p><div class="item-grid" id="itemGrid"></div><button id="moreItems" class="btn" type="button" hidden>載入更多道具</button></section><section class="wrap app-section extra" id="guide" hidden><div class="extrahead"><div class="kicker">GAME MECHANICS</div><h2>特殊機制與操作教學</h2><p class="lead">超級進化、原始回歸、神獸融合、Z 招式、極巨化與太晶化。</p></div><div id="guideList" class="guide-grid"></div></section></main>
 <dialog id="detail"><div class="detail"><div class="detailhead"><div><div class="kicker" id="detailNo"></div><h2 id="detailName"></h2></div><button class="close" id="close" type="button" aria-label="關閉">✕</button></div><div class="large"><img id="detailImg" alt="寶可夢 Minecraft 動態模型"></div><p id="detailForm" class="fine"></p><div class="command-list" id="detailCommands"></div><div class="variants" id="variants"></div><p class="fine">寶可夢生成／取得指令預設使用英文物種 ID；特殊形態的額外參數未經逐一驗證，切換形態僅切換圖像。中文物種名稱沿用本站舊版圖鑑的名稱對照，形態英文名稱依模組模型檔標示。15 KB 以下的圖片僅列為「待檢查」，並不代表已確認損壞。圖示由模組資源離線渲染。部分形態與動畫仍可能需要人工檢查，圖示不代表遊戲內一定能取得或自然生成。</p></div></dialog>
 <footer><div class="wrap">Cobblemon Atlas · 非官方玩家資料庫。圖片取自已安裝模組的模型與材質資源，非商業展示；原始素材依各來源授權。此頁專屬 Minecraft 1.21.1／Cobblemon 1.8.2，與首頁舊版圖鑑資料分開。</div></footer>
 <script>
@@ -104,7 +120,7 @@ $("#next").onclick=()=>{page++;redraw();window.scrollTo({top:0,behavior:"smooth"
  for(const rows of groups.values())rows.sort((a,b)=>(a.kind==="base"?-1:1)-(b.kind==="base"?-1:1));
  $("#stat").textContent=data.length+" 個已收錄 WebP · "+missingBase.filter(r=>entries.some(x=>x.id===r.id&&x.missing)).length+" 個待補動畫";
  try{const namesResponse=await fetch("data/names-zh-hant.json");if(namesResponse.ok){const names=await namesResponse.json();if(Array.isArray(names))zhNames=names}}catch(e){console.warn("中文名稱讀取失敗，保留英文",e)}
- redraw();
+ redraw();renderForms();
  const target=new URLSearchParams(location.search).get("pokemon");
  if(target){const match=entries.find(r=>r.id===target)||entries.find(r=>r.pokemon_id===target.padStart(4,"0"));if(match)openDetail(match)}
  }catch(err){$("#stat").textContent="資料載入失敗";$("#count").textContent="無法讀取圖片索引";$("#grid").textContent="請檢查連線後重新整理。"+err.message;console.error(err)}
@@ -119,6 +135,69 @@ const mechanisms=[
 {short:"太晶化",title:"Terastallization",desc:"使用太晶珠與寶可夢太晶屬性，改變戰鬥中的屬性策略與模型裝飾。",nodes:["準備太晶珠","選擇寶可夢","對戰太晶化"],steps:[["準備道具","在 JEI 查找 Tera Orb。"],["確認屬性","查看目標寶可夢的太晶相關資料。"],["對戰啟動","觀察太晶化效果與屬性變化。"]],note:"太晶冠飾品是否顯示可能受設定與模型資源影響。"}
 ];
 
+
+let formLimit=24;
+function formClass(r){
+ const f=r.form.toLowerCase();
+ if(/mega|megarayquaza|mega_z/.test(f))return "mega";
+ if(/gmax|gigantamax/.test(f))return "gmax";
+ if(/alolan|alola|galar|hisuian|paldean/.test(f))return "regional";
+ if(/primal/.test(f))return "primal";
+ if(/kyuremblack|kyuremwhite|dusk_mane|dawn_wings|necrozma_dusk|necrozma_dawn|calyrex_.*rider/.test(f))return "fusion";
+ return "other";
+}
+const formLabels={mega:"超級進化",gmax:"超極巨化",regional:"地區形態",primal:"原始回歸",fusion:"融合與特殊變化",other:"其他形態"};
+function formTool(r){
+ const f=r.form.toLowerCase();
+ let key=null;
+ if(/primal/.test(f)&&r.pokemon_id==="0383")key="red_orb";
+ else if(/primal/.test(f)&&r.pokemon_id==="0382")key="blue_orb";
+ else if(/kyuremblack|kyuremwhite/.test(f))key="dna_splicer";
+ else if(/mega/.test(f)&&!(/mega_z|mega_x|mega_y|megarayquaza/.test(f))){
+  const stem=f.replace(/_?mega(?:.*)?$/,"").replace(/^mega_?/,"");
+  const exact=stem+"ite";
+  const hit=itemEntries.find(x=>x.item_id==="mega_showdown:"+exact);
+  if(hit)key=exact;
+ }
+ return key?itemEntries.find(x=>x.item_id==="mega_showdown:"+key):null;
+}
+function spriteInto(parent,row,caption){
+ const wrap=document.createElement("div");wrap.className="special-sprite";
+ if(row&&!row.missing){const img=document.createElement("img");img.loading="lazy";img.src=linkOf(row);img.alt=caption;img.onerror=()=>{img.remove();const error=document.createElement("div");error.className="special-unavailable";error.textContent="圖片載入失敗";wrap.prepend(error)};wrap.append(img)}
+ else{const div=document.createElement("div");div.className="special-unavailable";div.textContent="一般形態動畫待補";wrap.append(div)}
+ const label=document.createElement("small");label.textContent=caption;wrap.append(label);parent.append(wrap)
+}
+function renderForms(){
+ if(!entries.length)return;
+ const q=$("#formSearch").value.trim().toLowerCase(),type=$("#formType").value;
+ const match=entries.filter(r=>r.kind==="special"&&(type==="all"||formClass(r)===type)&&(!q||[r.id,r.form,r.pokemon_id,chineseOf(r),nameOf(r.form)].some(v=>String(v).toLowerCase().includes(q))));
+ $("#formCount").textContent="符合 "+match.length+" / "+entries.filter(r=>r.kind==="special").length+" 個已渲染特殊形態（不包含待補模型）";
+ const grid=$("#formGrid");grid.replaceChildren();
+ for(const r of match.slice(0,formLimit)){
+  const card=document.createElement("article");card.className="special-card";
+  const meta=document.createElement("div");meta.className="special-meta";meta.textContent="#"+r.pokemon_id+" · "+formLabels[formClass(r)];
+  const name=document.createElement("h3");name.textContent=chineseOf(r)||nameOf(r.form);
+  const english=document.createElement("div");english.className="english";english.textContent=nameOf(r.form);
+  const pair=document.createElement("div");pair.className="special-pair";
+  const main=(groups.get(r.pokemon_id)||[]).find(x=>x.kind==="base");
+  spriteInto(pair,main,"一般形態");spriteInto(pair,r,nameOf(r.form));
+  const tool=document.createElement("div");tool.className="special-tool";
+  const matched=formTool(r);
+  if(matched){
+   const img=document.createElement("img");img.src=textureRoot+matched.item_id.split(":")[1]+".png";img.alt="";img.onerror=()=>img.remove();
+   const lbl=document.createElement("div");lbl.className="label";lbl.textContent=matched.name_zh_tw||matched.name_en;
+   const id=document.createElement("small");id.textContent=matched.item_id;lbl.append(id);
+   const go=document.createElement("button");go.className="btn";go.textContent="查道具";go.onclick=()=>showRelatedItem(matched.item_id);
+   tool.append(img,lbl,go)
+  }else{const note=document.createElement("div");note.className="none";note.textContent="尚無已驗證的專屬道具對應；可使用上方「道具」搜尋";tool.append(note)}
+  card.append(meta,name,english,pair,tool);grid.append(card)
+ }
+ if(!match.length){const p=document.createElement("p");p.className="message";p.textContent="找不到符合的特殊形態。";grid.append(p)}
+ $("#moreForms").hidden=formLimit>=match.length
+}
+$("#formSearch").addEventListener("input",()=>{formLimit=24;renderForms()});
+$("#formType").addEventListener("change",()=>{formLimit=24;renderForms()});
+$("#moreForms").onclick=()=>{formLimit+=24;renderForms()};
 let itemEntries=[],itemLimit=42;
 const textureRoot="https://raw.githubusercontent.com/yajatkaul/CobblemonMegaShowdown/main/common/src/main/resources/assets/mega_showdown/textures/item/";
 function renderItems(){
@@ -180,10 +259,10 @@ function renderGuideItems(){
  }))
 }
 renderGuideItems();
-function showTab(name){for(const id of ["pokedex","dex-results","items","commands","guide"]){const el=$("#"+id);if(el)el.hidden=(name==="pokedex"?!["pokedex","dex-results"].includes(id):id!==name)}
+function showTab(name){for(const id of ["pokedex","dex-results","forms","items","commands","guide"]){const el=$("#"+id);if(el)el.hidden=(name==="pokedex"?!["pokedex","dex-results"].includes(id):id!==name)}
  document.querySelectorAll("[data-tab-link]").forEach(a=>{a.classList.toggle("active",a.dataset.tabLink===name);a.setAttribute("aria-current",a.dataset.tabLink===name?"page":"false")})}
-function tabFromHash(){let x=location.hash.slice(1);return ["items","guide","commands"].includes(x)?x:"pokedex"}
+function tabFromHash(){let x=location.hash.slice(1);return ["forms","items","guide","commands"].includes(x)?x:"pokedex"}
 addEventListener("hashchange",()=>showTab(tabFromHash()));showTab(tabFromHash());
-fetch("mega-showdown/data/items.json").then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(x=>{itemEntries=x.item_entries||[];renderItems();renderGuideItems()}).catch(e=>{$("#itemCount").textContent="道具資料暫時無法載入";console.error(e)});
+fetch("mega-showdown/data/items.json").then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(x=>{itemEntries=x.item_entries||[];renderItems();renderGuideItems();renderForms()}).catch(e=>{$("#itemCount").textContent="道具資料暫時無法載入";console.error(e)});
 </script>
 <div id="toast" class="toast" hidden role="status"></div></body></html>
