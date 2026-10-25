@@ -84,7 +84,7 @@ $("#next").onclick=()=>{page++;redraw();window.scrollTo({top:0,behavior:"smooth"
  let reviewRows=[];
  try {
   const response=await fetch("../data/missing-base-review.json",{cache:"no-cache"});
-  if(response.ok){const audit=await response.json();if(Array.isArray(audit.entries))reviewRows=audit.entries.filter(x=>/^\\d{4}_[a-z0-9_-]+$/.test(x.id)&&/^\\d{4}$/.test(x.pokemon_id))}
+  if(response.ok){const audit=await response.json();if(Array.isArray(audit.entries))reviewRows=audit.entries.filter(x=>/^\d{4}_[a-z0-9_-]+$/.test(x.id)&&/^\d{4}$/.test(x.pokemon_id))}
  }catch(error){console.warn("一般形態盤點清單讀取失敗",error)}
  for(const row of [...missingBase,...reviewRows]){
   if(!entries.some(x=>x.pokemon_id===row.pokemon_id&&x.kind==="base"))
