@@ -37,6 +37,8 @@ ls -lh colab-transfer
 
 修復批次亦會將精確來源與動態骨骼診斷寫到 `reports/source-selection-lugia.json`。若需要擴大批次，修改 Notebook 開頭 `FORMS` 和 `ACTIONS`，並保留來源驗證；若選到其他已確認有意義的靜態姿勢，需另外建立明確的靜態輸出策略，不可直接取消 WebP 動態品質閘門。
 
+洛奇亞的大幅翅膀動作可能超出原始固定鏡頭；目前採最多 8 次縮放／置中重試（每次縮小 20%），完整影格仍需保留至少 6 像素邊界。若重試後仍裁切，保留失敗狀態，不強行保存有缺損的 WebP。
+
 ## CPU/GPU 實驗範圍
 
 - CPU 測試使用真實 Geo／材質／Poser／Animation，輸出 WebP 及品質報表。
