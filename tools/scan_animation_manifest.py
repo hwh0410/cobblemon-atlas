@@ -23,6 +23,7 @@ DEFAULT_INDEX = ROOT / "mega-showdown/data/pokemon-animated.json"
 DEFAULT_OUT = ROOT / "scan-output/animation-actions.json"
 CLIP_RE = re.compile(r"animation[.][\w.:-]+", re.I)
 BEDROCK_RE = re.compile(r"q[.]bedrock\(\s*(['\"])(.*?)\1\s*,\s*(['\"])(.*?)\3\s*\)", re.I)
+BEDROCK_ANY_RE = re.compile(r"q[.](bedrock|bedrock_stateful|bedrock_quirk)\(\s*(['\"])(.*?)\2\s*,\s*(['\"])(.*?)\4\s*\)", re.I)
 VALID = re.compile(r"^[a-z0-9_-]+$")
 
 
@@ -114,6 +115,44 @@ def references(data):
     visit(data)
     raw = "\n".join(strings)
     return set(CLIP_RE.findall(raw)), [(x[1], x[3]) for x in BEDROCK_RE.findall(raw)]
+
+
+def poser_uses(data):
+    """Map clip key to pose context without evaluating game-only conditions."""
+    uses = defaultdict(list)
+    if not isinstance(data, dict):
+        return uses
+
+    def add(expression, pose_name, role, condition=None, pose_types=None):
+        if not isinstance(expression, str):
+            return
+        for kind, _, species, _, action in BEDROCK_ANY_RE.findall(expression):
+            key = f"animation.{species}.{action}"
+            item = dict(pose=pose_name, role=(kind if kind != "bedrock" else role),
+                        condition=condition, pose_types=pose_types or [])
+            if item not in uses[key]:
+                uses[key].append(item)
+
+    named = data.get("animations", {})
+    for action in named.values() if isinstance(named, dict) else []:
+        add(action, None, "named")
+    poses = data.get("poses", {})
+    for pose_name, pose in poses.items() if isinstance(poses, dict) else []:
+        if not isinstance(pose, dict):
+            continue
+        pose_condition = pose.get("condition")
+        types = pose.get("poseTypes", [])
+        for entry in pose.get("animations", []):
+            if isinstance(entry, str):
+                add(entry, pose_name, "main", pose_condition, types)
+            elif isinstance(entry, dict):
+                add(entry.get("animation"), pose_name, "main",
+                    entry.get("condition") or pose_condition, types)
+        for action in pose.get("namedAnimations", {}).values():
+            add(action, pose_name, "named", pose_condition, types)
+        for action in pose.get("quirks", []):
+            add(action, pose_name, "quirk", pose_condition, types)
+    return uses
 
 
 def dynamic_info(clip):
@@ -232,6 +271,12 @@ def scan_form(form, records, clip_catalog):
         refs, calls = references(r["data"])
         form_refs.update(refs)
         bedrock_refs.extend(calls)
+    uses_by_pack = defaultdict(lambda: defaultdict(list))
+    for poser in posers:
+        for clip_key, uses in poser_uses(poser["data"]).items():
+            for usage in uses:
+                if usage not in uses_by_pack[poser["pack"]][clip_key]:
+                    uses_by_pack[poser["pack"]][clip_key].append(usage)
     clip_candidates = []
     linked_keys = form_refs
     for name_part in names:
@@ -263,6 +308,7 @@ def scan_form(form, records, clip_catalog):
             moving, conditional = dynamic_info(clip)
             matching = moving & model_pack_bones[source["pack"]]
             category, label = classify(clip_key)
+            contexts = uses_by_pack[source["pack"]].get(clip_key, [])
             aid = action_id(key if i == 0 else key + "_" + source["pack"] + str(i), used)
             duration = clip.get("animation_length") if isinstance(clip, dict) else None
             loop = clip.get("loop") if isinstance(clip, dict) else None
@@ -279,6 +325,8 @@ def scan_form(form, records, clip_catalog):
                 reasons.append("duplicate_clip_key_conflict")
             if conditional:
                 reasons.append("conditional_or_molang_needs_render_check")
+            if contexts and all(x["condition"] for x in contexts):
+                reasons.append("all_poser_uses_conditional")
             same_pack_posers = [r for r in posers if r["pack"] == source["pack"]]
             if not same_pack_posers:
                 reasons.append("missing_same_pack_poser")
@@ -297,6 +345,7 @@ def scan_form(form, records, clip_catalog):
                                 loop=loop if isinstance(loop, bool) else None,
                                 dynamic_bones=len(moving), model_bones_matched=len(matching),
                                 conditional=conditional, conflict=conflict, evidence=confidence,
+                                poser_uses=contexts,
                                 reason=reasons, render_job_key=hashlib.sha256(
                                     (name + clip_key + source["sha256"] + "|" + "|".join(
                                         sorted(x["sha256"] for x in same_pack_geo + posers)
