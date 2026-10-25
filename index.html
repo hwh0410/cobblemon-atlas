@@ -22,7 +22,7 @@
 .guide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.guide-card{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:20px}.guide-card h3{margin:0 0 10px}.guide-card p,.guide-card li{font-size:13px;color:var(--muted);line-height:1.7}.guide-card ol{padding-left:20px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:40;background:#243c33;color:white;padding:12px 17px;border-radius:8px;box-shadow:0 3px 20px #0002;max-width:90vw}
 @media(max-width:700px){.item-grid,.guide-grid{grid-template-columns:1fr}.topnav{gap:13px}.command-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
-</style>
+.guide-related{margin-top:16px;padding-top:13px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px}.guide-related h4{flex:0 0 100%;font-size:12px;color:var(--muted);margin:0 0 2px}.guide-related .btn{background:var(--tint);border-color:#dec4b8;color:var(--red);font-size:12px;padding:8px 11px}.guide-related .btn:hover{background:#ead1c3}.guide-related .btn:disabled{opacity:.5;cursor:not-allowed}</style>
 </head>
 <body>
 <header class="top"><div class="wrap"><a class="brand" href="./"><span>◉</span> COBBLEMON ATLAS</a><nav class="topnav"><a href="#pokedex" data-tab-link="pokedex">圖鑑</a><a href="#items" data-tab-link="items">道具</a><a href="#guide" data-tab-link="guide">玩法</a><a href="#commands" data-tab-link="commands">指令</a></nav></div></header>
@@ -142,11 +142,48 @@ $("#itemSearch").addEventListener("input",()=>{itemLimit=42;renderItems()});
 $("#moreItems").onclick=()=>{itemLimit+=42;renderItems()};
 const quickSamples=[["生成皮卡丘","/spawnpokemon pikachu"],["取得皮卡丘","/givepokemon pikachu"],["生成異色皮卡丘","/spawnpokemon pikachu shiny"],["取得異色皮卡丘","/givepokemon pikachu shiny"],["治療隊伍","/healpokemon"],["開啟 PC","/pc"],["給精靈球","/give @s cobblemon:poke_ball 64"]];
 $("#commandList").replaceChildren(...quickSamples.map(([label,cmd])=>{const b=document.createElement("button");b.className="btn";b.textContent=label+" · 複製";b.title=cmd;b.onclick=()=>copy(cmd);return b}));
-$("#guideList").replaceChildren(...mechanisms.map(m=>{const el=document.createElement("article");el.className="guide-card";const h=document.createElement("h3");h.textContent=m.short+" · "+m.title;const p=document.createElement("p");p.textContent=m.desc;const ol=document.createElement("ol");for(const [title,detail] of m.steps){const li=document.createElement("li");li.textContent=title+" — "+detail;ol.append(li)}const foot=document.createElement("p");foot.textContent=m.note;el.append(h,p,ol,foot);return el}));
+const relatedItemsByMechanic=[
+ ["mega_showdown:lucarionite","mega_showdown:mega_bracelet"],
+ ["mega_showdown:red_orb","mega_showdown:blue_orb"],
+ ["mega_showdown:dna_splicer"],
+ ["mega_showdown:z_ring"],
+ ["mega_showdown:dynamax_band","mega_showdown:dynamax_candy"],
+ ["mega_showdown:tera_orb"]
+];
+function findItemById(id){return itemEntries.find(x=>x.item_id===id)}
+function showRelatedItem(id){
+ const item=findItemById(id);
+ if(!item){notify("道具資料尚未載入，請稍後再試");return}
+ $("#itemSearch").value=id;itemLimit=42;renderItems();
+ location.hash="items";showTab("items");
+ $("#items").scrollIntoView({behavior:"smooth",block:"start"});
+ $("#itemSearch").focus({preventScroll:true});
+}
+function renderGuideItems(){
+ $("#guideList").replaceChildren(...mechanisms.map((m,index)=>{
+  const el=document.createElement("article");el.className="guide-card";
+  const h=document.createElement("h3");h.textContent=m.short+" · "+m.title;
+  const p=document.createElement("p");p.textContent=m.desc;
+  const ol=document.createElement("ol");
+  for(const [title,detail] of m.steps){const li=document.createElement("li");li.textContent=title+" — "+detail;ol.append(li)}
+  const foot=document.createElement("p");foot.textContent=m.note;
+  const related=document.createElement("div");related.className="guide-related";
+  const heading=document.createElement("h4");heading.textContent="關聯道具 · 點擊直接搜尋";related.append(heading);
+  for(const id of relatedItemsByMechanic[index]){
+   const item=findItemById(id);
+   const b=document.createElement("button");b.type="button";b.className="btn guide-item";
+   b.textContent=item?.name_zh_tw||item?.name_en||id.split(":")[1];
+   b.title=id;b.disabled=itemEntries.length>0&&!item;
+   b.onclick=()=>showRelatedItem(id);related.append(b)
+  }
+  el.append(h,p,ol,foot,related);return el
+ }))
+}
+renderGuideItems();
 function showTab(name){for(const id of ["pokedex","dex-results","items","commands","guide"]){const el=$("#"+id);if(el)el.hidden=(name==="pokedex"?!["pokedex","dex-results"].includes(id):id!==name)}
  document.querySelectorAll("[data-tab-link]").forEach(a=>{a.classList.toggle("active",a.dataset.tabLink===name);a.setAttribute("aria-current",a.dataset.tabLink===name?"page":"false")})}
 function tabFromHash(){let x=location.hash.slice(1);return ["items","guide","commands"].includes(x)?x:"pokedex"}
 addEventListener("hashchange",()=>showTab(tabFromHash()));showTab(tabFromHash());
-fetch("mega-showdown/data/items.json").then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(x=>{itemEntries=x.item_entries||[];renderItems()}).catch(e=>{$("#itemCount").textContent="道具資料暫時無法載入";console.error(e)});
+fetch("mega-showdown/data/items.json").then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(x=>{itemEntries=x.item_entries||[];renderItems();renderGuideItems()}).catch(e=>{$("#itemCount").textContent="道具資料暫時無法載入";console.error(e)});
 </script>
 <div id="toast" class="toast" hidden role="status"></div></body></html>
