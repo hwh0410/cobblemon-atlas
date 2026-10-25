@@ -52,3 +52,15 @@ pre{background:#eceee7;color:var(--ink)}
 .savegrid label{color:var(--muted)}
 #toast{background:var(--ink);border-radius:4px}
 @media(max-width:780px){.top{padding:14px 0}nav{grid-template-columns:repeat(5,minmax(0,1fr));gap:2px}nav button{font-size:12px;padding:10px 4px}nav a.nav-link{font-size:11px;padding:8px 3px}.stat{padding:13px}#intro{padding:34px 0 20px}.cards{grid-template-columns:1fr}.toolbar input#search{min-width:0}}
+
+/* Quick-play Pokedex controls with newer animated portrait previews */
+.poke-identity{display:flex;align-items:center;gap:12px;min-width:0;margin:9px 0}
+.poke-identity>div{min-width:0}.poke-identity h3{margin:0 0 5px}.poke-preview{height:90px;width:90px;object-fit:contain;flex:0 0 90px;background:#1d2d37;border-radius:10px}
+.quick-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:14px}
+.quick-copy{border:1px solid #37695f;border-radius:8px;background:#194038;color:#b0f2db;padding:9px 5px;font-size:12px;line-height:1.3;min-width:0}
+.quick-copy:hover{background:#275749}.quick-copy:active{transform:scale(.97)}
+.detail-forms{display:flex;gap:9px;overflow-x:auto;overscroll-behavior-x:contain;margin:12px 0 19px}
+.detail-forms a{display:flex;flex-direction:column;align-items:center;flex:0 0 94px;gap:4px;padding:6px;text-align:center;background:#1a2a38;border:1px solid #344a5a;border-radius:9px;text-decoration:none;font-size:10px;color:#c3d6e2;overflow-wrap:anywhere}
+.detail-forms img{width:78px;height:76px;object-fit:contain}
+.version-note{font-size:12px;border:1px solid #4b5c61;background:#172b32;color:#bbd8d4;border-radius:10px;padding:12px;margin:12px 0}
+@media(max-width:780px){.poke{min-height:0}.poke-preview{width:72px;height:72px;flex-basis:72px}.quick-buttons{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.quick-copy{font-size:11px;padding:9px 2px}.poke-identity{margin:9px 0}}
