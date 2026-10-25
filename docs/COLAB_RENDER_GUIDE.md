@@ -66,3 +66,9 @@ ls -lh colab-transfer
 - `checkpoints/render-jobs.json`：續跑狀態
 
 每隻形態各執行一次 renderer，避免 forms × actions 意外交叉組合。已完成且工作簽章一致的結果會續用；遇到失敗將保留報告，不會將有裁切或靜態失敗的 WebP 發布到站點。Notebook 需要使用者在 Colab 登入並啟動執行階段。
+
+## 烈空坐／超夢動作語義稽核
+
+[Colab 語義稽核 Notebook](https://colab.research.google.com/github/hwh0410/cobblemon-atlas/blob/feat/animation-manifest-scanner-phase1/notebooks/Cobblemon_Colab_Semantic_Audit.ipynb) 會讀取既有 Drive WebP、43 MB Manifest 與 checkpoint，輸出 `reports/semantic-audit/semantic-audit.json`、烈空坐每個可用動作的 6 影格接觸圖。靜態的超夢動作會以未渲染及原始失敗理由列於報告。
+
+此流程只寫入獨立報告目錄，不改動 `renders/`、`checkpoints/` 或網站。已通過像素檢查的烈空坐兩片不應直接發布：要先人工檢查姿勢、方向和縮放。未來批次的自動選樣已排除含 `old` 與 `test` 的 clip 名稱，但此過濾不等於全面動畫相容性驗證。
