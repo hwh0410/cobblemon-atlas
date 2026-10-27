@@ -116,8 +116,22 @@ def render_form(repo,form,resolved,out):
             file=dest/(pose_name+".webp")
             frames[0].save(file,format="WEBP",save_all=True,append_images=frames[1:],
                            duration=83,loop=0,quality=90,method=5)
-            row["status"]="candidate"
-            row["file"]=file.name
+            with Image.open(file) as check:
+                decoded_count=check.n_frames
+                decoded=[]
+                for n in range(decoded_count):
+                    check.seek(n)
+                    decoded.append(check.convert("RGBA").copy())
+            decoded_stats=inspect_frames(decoded,12)
+            row["decoded_frames"]=decoded_count
+            row["decoded_changed_pixels_max"]=decoded_stats["changed_pixels_max"]
+            if decoded_count>=2 and decoded_stats["motion_pass"]:
+                row["status"]="candidate"
+                row["file"]=file.name
+            else:
+                # Keep the diagnostic file in its isolated directory only.
+                row["status"]="audit"
+                row["reason"]="decoded_webp_lost_motion"
         else:
             row["status"]="audit"
             row["reason"]="static_empty_or_bad_frame"
