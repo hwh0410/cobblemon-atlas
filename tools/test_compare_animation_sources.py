@@ -15,6 +15,7 @@ class SourceComparisonTests(unittest.TestCase):
         self.assertEqual(clip_features(animated, bones)["motion_evidence"], "keyframes")
         self.assertEqual(clip_features(fixed, bones)["motion_evidence"], "static_or_unproven")
         self.assertEqual(clip_features({"bones": {"head": {"rotation": "math.sin(q.anim_time)"}}}, bones)["motion_evidence"], "time_expression")
+        self.assertEqual(clip_features({"bones": {"locator_item": {"position": "q.anim_time"}}}, {"locator_item"})["motion_evidence"], "static_or_unproven")
 
     def test_zip_scanner_selects_sources_without_extracting(self):
         with tempfile.TemporaryDirectory() as td:
