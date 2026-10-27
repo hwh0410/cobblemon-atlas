@@ -121,10 +121,11 @@ def scan_form(archives, form, resolved):
                 if not isinstance(clip, dict):
                     continue
                 features = clip_features(clip, known)
-                expected_namespace = "animation." + form.split("_", 1)[1] + "."
+                expected_namespaces = ("animation." + form.split("_", 1)[1] + ".",
+                                       "animation." + form + ".")
                 variants[key].append({"source_pack": pack, "source_path": member[len(pack) + 1:],
                                       "clip_sha256": sha(clip), "referenced_by_resolver_poser": key in refs,
-                                      "same_form_namespace": key.startswith(expected_namespace),
+                                      "same_form_namespace": key.startswith(expected_namespaces),
                                       **features})
     indexed = {}
     for name, entries in sorted(variants.items()):
