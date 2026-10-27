@@ -89,6 +89,11 @@ def render_trial(renderer, form, poser, info, clips, label, base_pose, overlay, 
         return report
     state = {"time": 0.0, "period": 2.0, "loop": True}
     renderer.channel_at_zero = channel_sampler(renderer, state)
+    original_collect = renderer.collect_anim
+    # Standalone Rayquaza action clips encode absolute bone targets. Override
+    # repeated channels instead of adding the base rotations a second time.
+    from render_blend_modes import collect_override
+    report["blend_policy"] = "action_channel_override" if form == "0384_rayquaza" else "additive"
     info["profileScale"] = float(poser.get("profileScale") or 1.0)
     info["profileTranslation"] = list(poser.get("profileTranslation") or [0, 0, 0])
     fixed_camera = None
@@ -96,6 +101,10 @@ def render_trial(renderer, form, poser, info, clips, label, base_pose, overlay, 
         sequences = []
         for selection in (base, base + [overlay]):
             info["clips"] = [(key, clips[key]) for key in selection]
+            if form == "0384_rayquaza" and len(selection) > len(base):
+                renderer.collect_anim = lambda _info, module=renderer: collect_override(module, _info)
+            else:
+                renderer.collect_anim = original_collect
             frames = []
             for n in range(24):
                 state["time"] = n / 12.0
@@ -108,6 +117,7 @@ def render_trial(renderer, form, poser, info, clips, label, base_pose, overlay, 
             break
         if attempt < 8:
             adjust_fixed_camera(info, combined_stats["alpha_bbox"], 224)
+    renderer.collect_anim = original_collect
     base_stats = inspect_frames(base_frames, 12)
     layered_stats = inspect_frames(layered_frames, 12)
     overlay_max, overlay_per_frame = overlay_difference(base_frames, layered_frames)
