@@ -103,7 +103,7 @@ def render_form(repo,form,resolved,out):
                 img,_=renderer.render_species(form,size=224,ss=2,frame="cobblemon")
                 frames.append(img.convert("RGBA"))
             metrics=inspect_frames(frames,12)
-            if not metrics["visible"] or not metrics["motion_pass"] or metrics["min_margin_px"]>=6:
+            if not metrics["visible"] or metrics["min_margin_px"]>=6:
                 break
             if attempt<8:
                 adjust_fixed_camera(info,metrics["alpha_bbox"],224)
@@ -132,9 +132,19 @@ def render_form(repo,form,resolved,out):
                 # Keep the diagnostic file in its isolated directory only.
                 row["status"]="audit"
                 row["reason"]="decoded_webp_lost_motion"
+        elif metrics["visible"] and metrics["min_margin_px"]>=6 and not metrics["motion_pass"]:
+            # A Bedrock pose may intentionally be constant. Preserve a true still
+            # without advertising it as animated WebP or silently discarding it.
+            still=dest/(pose_name+".png")
+            frames[0].save(still,format="PNG")
+            with Image.open(still) as check:
+                check.verify()
+            row["status"]="static_pose"
+            row["reason"]="no_visible_temporal_change"
+            row["file"]=still.name
         else:
             row["status"]="audit"
-            row["reason"]="static_empty_or_bad_frame"
+            row["reason"]="empty_or_bad_frame"
         output["poses"][pose_name]=row
         print(form,pose_name,row["status"],keys,flush=True)
     return output
