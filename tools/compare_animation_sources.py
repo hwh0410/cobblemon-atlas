@@ -39,6 +39,7 @@ def clip_features(clip, geometry_bones):
     keyframes = 0
     changing_keyframes = 0
     time_expressions = 0
+    non_locator_time_expressions = 0
     other_expressions = 0
     for bone, channels in bones.items():
         (matched if bone.casefold() in geometry_bones else unmatched).append(bone)
@@ -60,17 +61,20 @@ def clip_features(clip, geometry_bones):
             encoded = json.dumps(value).lower()
             if TIME_EXPRESSION.search(encoded):
                 time_expressions += 1
+                if not bone.casefold().startswith("locator"):
+                    non_locator_time_expressions += 1
             elif "math." in encoded or "q." in encoded or "query." in encoded:
                 other_expressions += 1
     # Time expressions are possible motion, not definitive without rendering.
     evidence = ("keyframes" if changing_keyframes else
-                "time_expression" if time_expressions else "static_or_unproven")
+                "time_expression" if non_locator_time_expressions else "static_or_unproven")
     return {
         "clip_bones": len(bones), "matched_bones": len(matched),
         "unmatched_bones": unmatched[:20],
         "keyframed_channels": keyframes,
         "changing_keyframed_channels": changing_keyframes,
         "time_expression_channels": time_expressions,
+        "non_locator_time_expression_channels": non_locator_time_expressions,
         "other_expression_channels": other_expressions,
         "motion_evidence": evidence,
         "duration_sec": clip.get("animation_length"), "loop": clip.get("loop"),
@@ -117,8 +121,10 @@ def scan_form(archives, form, resolved):
                 if not isinstance(clip, dict):
                     continue
                 features = clip_features(clip, known)
+                expected_namespace = "animation." + form.split("_", 1)[1] + "."
                 variants[key].append({"source_pack": pack, "source_path": member[len(pack) + 1:],
                                       "clip_sha256": sha(clip), "referenced_by_resolver_poser": key in refs,
+                                      "same_form_namespace": key.startswith(expected_namespace),
                                       **features})
     indexed = {}
     for name, entries in sorted(variants.items()):
@@ -126,7 +132,8 @@ def scan_form(archives, form, resolved):
         for entry in entries:
             entry["cross_pack_conflict"] = len(hashes) > 1
             entry["potential_dynamic_candidate"] = (
-                entry["matched_bones"] > 0 and entry["motion_evidence"] != "static_or_unproven")
+                entry["matched_bones"] > 0 and entry["same_form_namespace"]
+                and entry["motion_evidence"] != "static_or_unproven")
         indexed[name] = entries
     all_entries = [e for v in indexed.values() for e in v]
     promising = [dict(clip_key=k, **e) for k, v in indexed.items() for e in v
